@@ -1,0 +1,4 @@
+export(judgeit,v2s,vshar)
+S3method(summary, judgeit)   
+S3method(print, judgeit)   
+S3method(plot,judgeit)

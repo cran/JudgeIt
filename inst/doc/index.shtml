@@ -1,0 +1,81 @@
+<html>
+<head>
+<title>JudgeIt II Software Website</title>
+<script language='Javascript' src='/gking.js'></script></HEAD>
+
+<BODY><script language="Javascript">displayHeader()</script>
+
+<h1>JudgeIt II: A Program for Evaluating Electoral Systems and
+Redistricting Plans</h1>
+
+<a href="http://www.stat.columbia.edu/~gelman/">Andrew Gelman</a>, <a
+href="/">Gary King</a>, <a
+href="http://fas.harvard.edu/~acthomas">Andrew C. Thomas</a>
+
+<br /><br />
+<!-- rbuild: replace 'Version:' '</b>' version -->
+<b>Version:1.1.6.3</b>
+
+<p style="float:right; width: 300; margin: 1.5em;"> <img
+src="/judgeit/sct.jpg" width="300" /> <br /><small>
+...</small></p>
+
+<p>JudgeIt allows a user to construct a model of a two-party election
+system over multiple election cycles, derive quantities of interest
+about the system through statistical estimation and simulation, and
+produce output summary statistics and graphical plots of those
+quantities.  Some of the quantities of interest are based on partisan
+symmetry as a standard of fairness in legislative redistricting, such
+as <em>partisan bias</em> as the deviation from fairness and
+<em>electoral responsiveness</em> which indexes how party control of
+legislative seats responds to changes in a party's success at the
+polls even in a fair system.  (A uniform consensus has existed in the
+academic literature since at least <a
+href="/files/abs/sv-abs.shtml">King and Browning (1987)</a> on
+partisan symmetry as a standard for fairness, and even the U.S.
+Supreme Court now appears to agree; see <a
+href="/files/abs/jp-abs.shtml">Grofman and King (2007)</a>.)  JudgeIt
+will also estimate and graph seats-votes curves, make specific vote
+and seat predictions for individual districts, and calculate numerous
+other relevant statistics.
+
+<p> The program can evaluate electoral systems (1) When an election
+already has taken place, (2) When an election has not been held yet
+but a new redistricting plan (or plans) has been proposed or
+implemented, and (3) When you wish to assess what an election would
+have been like if held under certain specified counterfactual
+conditions (such as if no minority districts had been drawn, or term
+limitations had prevented incumbents from running for reelection).
+The methods implemented in JudgeIt were developed in <a
+href="http://gking.harvard.edu/files/abs/writeit-abs.shtml">Gelman and
+King (1994)</a> and <a href="/projects/red.shtml">these other academic
+articles</a>.
+
+<p>JudgeIt II is a new program that works within R, and follows in the
+spirit with the same purpose as the original version of JudgeIt, by
+Andrew Gelman and Gary King.  This first version worked within DOS or
+Gauss and included its own programming language, which is no longer
+necessary due to features now in R.  The original version is still
+available <a href="/judgeit/judgeitI">here</a>.
+  <ul>
+    <li>Documentation:
+    <a href="/judgeit/inst/doc/judgeit.pdf">PDF</a> </li>
+
+    <li>Installation: Load R, and type:
+    install.packages("JudgeIt",repos="http://gking.harvard.edu")</li>
+
+    <li>Please send <strong>All</strong> <span class="orange">questions, bugs, and
+    requests</span> to the
+    JudgeIt Mailing List, <a
+	href="http://lists.gking.harvard.edu/index.cgi?info=judgeit"
+	target="gkingext">[Un]Subscribe</a>, or <a
+	href="http://lists.hmdc.harvard.edu/lists/judgeit/"
+	target="gkingext">Browse/Search Archives</a></li>
+
+    <li><a href="/judgeit/" target="ChangeDetectionWiz"
+	onClick="doChangeDetectionPopup()"> Track JudgeIt changes</a></li>
+
+  </ul>
+
+<script language="Javascript">displayFooter()</script></BODY>
+</html>

@@ -1,0 +1,31 @@
+\BOOKMARK [1][-]{section.1}{Introduction}{}
+\BOOKMARK [1][-]{section.2}{Installation Instructions and Requirements}{}
+\BOOKMARK [2][-]{subsection.2.1}{Case Syntax}{section.2}
+\BOOKMARK [1][-]{section.3}{Usage Overview}{}
+\BOOKMARK [1][-]{section.4}{Formatting Data Sets}{}
+\BOOKMARK [1][-]{section.5}{Included Data Sets}{}
+\BOOKMARK [1][-]{section.6}{Step 1: Create a JudgeIt object}{}
+\BOOKMARK [2][-]{subsection.6.1}{Other Options}{section.6}
+\BOOKMARK [3][-]{subsubsection.6.1.1}{Selecting a data subset}{subsection.6.1}
+\BOOKMARK [3][-]{subsubsection.6.1.2}{Automatic Use of Previous Year's Results}{subsection.6.1}
+\BOOKMARK [3][-]{subsubsection.6.1.3}{Redistricting}{subsection.6.1}
+\BOOKMARK [3][-]{subsubsection.6.1.4}{Uncontested Districts}{subsection.6.1}
+\BOOKMARK [3][-]{subsubsection.6.1.5}{Simulation Parameters}{subsection.6.1}
+\BOOKMARK [3][-]{subsubsection.6.1.6}{Applying District Weights: Some Count More than Others}{subsection.6.1}
+\BOOKMARK [1][-]{section.7}{Step 2: Conduct Analyses}{}
+\BOOKMARK [2][-]{subsection.7.1}{Evaluation}{section.7}
+\BOOKMARK [2][-]{subsection.7.2}{Prediction}{section.7}
+\BOOKMARK [2][-]{subsection.7.3}{Counterfactual Evaluation}{section.7}
+\BOOKMARK [2][-]{subsection.7.4}{Using new.covariates to recode data}{section.7}
+\BOOKMARK [2][-]{subsection.7.5}{distreport: Examine the estimation}{section.7}
+\BOOKMARK [2][-]{subsection.7.6}{seats: Given a vote share, determine the seat share}{section.7}
+\BOOKMARK [3][-]{subsubsection.7.6.1}{Plotting a seats-votes curve}{subsection.7.6}
+\BOOKMARK [2][-]{subsection.7.7}{prob: Given a vote share, determine the probability of an electoral win}{section.7}
+\BOOKMARK [2][-]{subsection.7.8}{winprob: Given a vote share or deviation, determine the probability that the seat share is within a particular margin}{section.7}
+\BOOKMARK [2][-]{subsection.7.9}{svsum: Determine partisan bias and responsiveness}{section.7}
+\BOOKMARK [2][-]{subsection.7.10}{winvote: Given a seat share, determine the total vote share required to attain it}{section.7}
+\BOOKMARK [2][-]{subsection.7.11}{voting.power: Determine the power that distinct groups have in changing an election result}{section.7}
+\BOOKMARK [1][-]{section.8}{Further JudgeIt output options}{}
+\BOOKMARK [2][-]{subsection.8.1}{System summaries}{section.8}
+\BOOKMARK [1][-]{section.9}{Accessing Raw judgeit.object Data}{}
+\BOOKMARK [1][-]{section.A}{Several demos}{}

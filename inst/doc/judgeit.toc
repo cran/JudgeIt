@@ -1,0 +1,31 @@
+\contentsline {section}{\numberline {1}Introduction}{2}{section.1}
+\contentsline {section}{\numberline {2}Installation Instructions and Requirements}{2}{section.2}
+\contentsline {subsection}{\numberline {2.1}Case Syntax}{2}{subsection.2.1}
+\contentsline {section}{\numberline {3}Usage Overview}{3}{section.3}
+\contentsline {section}{\numberline {4}Formatting Data Sets}{3}{section.4}
+\contentsline {section}{\numberline {5}Included Data Sets}{3}{section.5}
+\contentsline {section}{\numberline {6}Step 1: Create a \textsc {JudgeIt}\ object}{4}{section.6}
+\contentsline {subsection}{\numberline {6.1}Other Options}{4}{subsection.6.1}
+\contentsline {subsubsection}{\numberline {6.1.1}Selecting a data subset}{4}{subsubsection.6.1.1}
+\contentsline {subsubsection}{\numberline {6.1.2}Automatic Use of Previous Year's Results}{4}{subsubsection.6.1.2}
+\contentsline {subsubsection}{\numberline {6.1.3}Redistricting}{5}{subsubsection.6.1.3}
+\contentsline {subsubsection}{\numberline {6.1.4}Uncontested Districts}{5}{subsubsection.6.1.4}
+\contentsline {subsubsection}{\numberline {6.1.5}Simulation Parameters}{5}{subsubsection.6.1.5}
+\contentsline {subsubsection}{\numberline {6.1.6}Applying District Weights: Some Count More than Others}{5}{subsubsection.6.1.6}
+\contentsline {section}{\numberline {7}Step 2: Conduct Analyses}{5}{section.7}
+\contentsline {subsection}{\numberline {7.1}Evaluation}{6}{subsection.7.1}
+\contentsline {subsection}{\numberline {7.2}Prediction}{6}{subsection.7.2}
+\contentsline {subsection}{\numberline {7.3}Counterfactual Evaluation}{6}{subsection.7.3}
+\contentsline {subsection}{\numberline {7.4}Using new.covariates to recode data}{6}{subsection.7.4}
+\contentsline {subsection}{\numberline {7.5}distreport: Examine the estimation}{6}{subsection.7.5}
+\contentsline {subsection}{\numberline {7.6}seats: Given a vote share, determine the seat share}{7}{subsection.7.6}
+\contentsline {subsubsection}{\numberline {7.6.1}Plotting a seats-votes curve}{7}{subsubsection.7.6.1}
+\contentsline {subsection}{\numberline {7.7}prob: Given a vote share, determine the probability of an electoral win}{7}{subsection.7.7}
+\contentsline {subsection}{\numberline {7.8}winprob: Given a vote share or deviation, determine the probability that the seat share is within a particular margin}{7}{subsection.7.8}
+\contentsline {subsection}{\numberline {7.9}svsum: Determine partisan bias and responsiveness}{7}{subsection.7.9}
+\contentsline {subsection}{\numberline {7.10}winvote: Given a seat share, determine the total vote share required to attain it}{8}{subsection.7.10}
+\contentsline {subsection}{\numberline {7.11}voting.power: Determine the power that distinct groups have in changing an election result}{8}{subsection.7.11}
+\contentsline {section}{\numberline {8}Further \textsc {JudgeIt}\ output options}{8}{section.8}
+\contentsline {subsection}{\numberline {8.1}System summaries}{8}{subsection.8.1}
+\contentsline {section}{\numberline {9}Accessing Raw judgeit.object Data}{8}{section.9}
+\contentsline {section}{\numberline {A}Several demos}{9}{section.A}
