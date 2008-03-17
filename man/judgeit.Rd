@@ -35,7 +35,8 @@ judgeit (model.formula=~1,vote.formula=NULL,same.districts=NULL,data,
           
                     probability.range=c(0.5,1),
                     voting.groups=NULL,
-                    all.groups=NULL,
+                    all.groups=NULL, state.group = NULL,
+                    disaggregate = NULL,
                     ...    #for the model.frame work.
                    )
 
@@ -114,6 +115,10 @@ judgeit (model.formula=~1,vote.formula=NULL,same.districts=NULL,data,
     turnout data for several groups in each district.}
   \item{all.groups}{In the voting.power routine, this is a matrix of
     eligible voter data for several groups in each district.}
+  \item{state.group}{For the ``chopcollege'' routine, indicates the
+    membership of each electoral district in a state.}
+  \item{disaggregate}{Which state's electors are chosen by congressional
+  district in the ``chopcollege'' routine.}
   \item{\dots}{Extra commands to be used with model.frame(), a routine
     used in assembling the linear model for each year.}
 }

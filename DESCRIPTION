@@ -1,6 +1,6 @@
 Package: JudgeIt
-Version: 1.1.6.3
-Date: 2007-09-10
+Version: 1.2.0
+Date: 2008-03-17
 Title: JudgeIt
 Author: Andrew Gelman <gelman@stat.columbia.edu>,
         Gary King <king@harvard.edu>,
@@ -10,6 +10,6 @@ Depends: R (>= 2.4)
 Description: Calculates bias, responsiveness, and other characteristics of
         two-party electoral systems, with district-level electoral and
         other data.
-License: GPL version 2 or newer
+License: GPL version 2
 URL: http://gking.harvard.edu/
-Packaged: Mon Sep 10 09:22:40 2007; king
+Packaged: Mon Mar 17 16:42:45 2008; king

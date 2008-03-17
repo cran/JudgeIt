@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159-1.10b (Web2C 7.4.5) (format=pdflatex 2007.8.1)  10 SEP 2007 09:22
+This is pdfTeX, Version 3.14159-1.10b (Web2C 7.4.5) (format=pdflatex 2007.11.9)  17 MAR 2008 16:42
 **judgeit
 (./judgeit.tex{/usr/share/texmf/pdftex/config/pdftex.cfg}
 LaTeX2e <2001/06/01>
@@ -49,11 +49,11 @@ File: pdftex.def 2002/06/19 v0.03k graphics/color for pdftex
 \Gin@req@height=\dimen103
 \Gin@req@width=\dimen104
 )
-(/nfs/fs1/home/K/king/texinputs/natbib.sty
-Package: natbib 1999/02/25 6.9 (PWD)
+(/usr/share/texmf/tex/latex/natbib/natbib.sty
+Package: natbib 2000/07/24 7.0a (PWD)
 \bibhang=\skip43
 \bibsep=\skip44
-LaTeX Info: Redefining \cite on input line 486.
+LaTeX Info: Redefining \cite on input line 508.
 \c@NAT@ctr=\count88
 )
 (/usr/share/texmf/tex/latex/amsmath/amsmath.sty
@@ -435,10 +435,10 @@ LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
  ) 
 Here is how much of TeX's memory you used:
- 4305 strings out of 95437
- 54054 string characters out of 1190234
- 111491 words of memory out of 1000001
- 7164 multiletter control sequences out of 10000+50000
+ 4324 strings out of 95437
+ 54221 string characters out of 1190233
+ 111784 words of memory out of 1000001
+ 7183 multiletter control sequences out of 10000+50000
  16287 words of font info for 63 fonts, out of 500000 for 1000
  14 hyphenation exceptions out of 1000
  34i,11n,36p,446b,295s stack positions out of 1500i,500n,5000p,200000b,5000s
@@ -459,4 +459,4 @@ are/texmf/fonts/type1/bluesky/cm/cmr6.pfb></usr/share/texmf/fonts/type1/bluesky
 /cm/cmr8.pfb></usr/share/texmf/fonts/type1/bluesky/cm/cmr12.pfb></usr/share/tex
 mf/fonts/type1/bluesky/cm/cmr17.pfb>{/usr/share/texmf/dvips/tetex/0ef0afca.enc}
 </usr/share/texmf/fonts/type1/bluesky/cm/cmcsc10.pfb>
-Output written on judgeit.pdf (11 pages, 179629 bytes).
+Output written on judgeit.pdf (11 pages, 179062 bytes).
