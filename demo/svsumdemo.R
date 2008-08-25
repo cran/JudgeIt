@@ -13,10 +13,9 @@ j.ob <- judgeit(model.form=VOTE~unc(VOTE)+INC,vote.form=TURNOUT~1,
                     use.last.votes=T,subset=DELSOUTH==0)
 
 #get some seats-votes summaries.
-j.ob <- judgeit(judgeit.object=j.ob,routine="svsum",year=which(elecyears==1944))
-j.ob
+j.ob.1 <- bias.resp(j.ob,year=1944)
+j.ob.1
 
-judgeit(judgeit.object=j.ob,routine="svsum",year=which(elecyears==1990))
-
-judgeit(judgeit.object=j.ob,routine="svsum",year=which(elecyears==1992))
+bias.resp(j.ob,year=1990)
+bias.resp(j.ob,year=1992)
 

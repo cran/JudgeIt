@@ -31,7 +31,7 @@
 \newcommand{\jud}{\texttt{judgeit}\ }
 
 \title{\JudgeIt~II: A Program for Evaluating Electoral Systems and
-  Redistricting Plans\thanks{Available from
+  Redistricting Plans\thanks{Available from CRAN (http://cran.r-project.org/) and
     http://GKing.Harvard.edu/judgeit.}}
 
 \author{Andrew Gelman \and Gary King\thanks{David Florence Professor
@@ -39,10 +39,10 @@
     Social Science, 1737 Cambridge Street, Harvard University,
     Cambridge MA 02138; http://GKing.Harvard.Edu, King@Harvard.Edu,
     (617) 495-2027).}  \and %
-  Andrew C. Thomas\thanks{PhD Candidate, Department of Statistics, and Graduate Associate, Institute for Quantitative Social Science, Harvard University. http://www.fas.harvard.edu/$\sim$acthomas/; acthomas@fas.harvard.edu.}}
+	Andrew C. Thomas\thanks{PhD Candidate, Department of Statistics, and Graduate Associate, Institute for Quantitative Social Science, Harvard University. http://www.fas.harvard.edu/$\sim$acthomas/; acthomas@fas.harvard.edu.}}
 
 % rbuild: replace 'Version ' '\\' Version
-\date{Version 1.2.0\\ \today}
+\date{Version 1.3.2\\ \today}
 
 %
 \makeindex
@@ -61,65 +61,31 @@
 
 \section{Introduction}
 
-\JudgeIt II brings the analytical routines of the original version of
-\JudgeIt to the R Project for Statistical Computing, while also greatly
-simplifying its interface and control system.\footnote{The original
-  version of JudgeIt, written by Gary King and Andrew Gelman in
-  versions available for DOS and in the language Gauss, is still
-  available at \url{http://gking.harvard.edu/judgeit/judgeitI}.}  The
-methods implemented in this software were developed in
-\citet{GelKin90,GelKin90b,GelKin94a,GelKin94b,KinGel91,GelKatKin04}.
+\JudgeIt II brings the analytical routines of the original version of \JudgeIt to the R Project for Statistical Computing, while also greatly simplifying its interface and control system.\footnote{The original version of JudgeIt, written by Gary King and Andrew Gelman in   versions available for DOS and in the language Gauss, is still available at \url{http://gking.harvard.edu/judgeit/judgeitI}.}  The methods implemented in this software were developed in \citet{GelKin90,GelKin90b,GelKin94a,GelKin94b,KinGel91,GelKatKin04}.
 
-\JudgeIt allows a user to construct a model of a two-party election
-system over multiple election cycles, derive quantities of interest
-about the system through statistical estimation and simulation, and
-produce output summary statistics and graphical plots of those
-quantities.  Some of the quantities of interest are based on partisan
-symmetry as a standard of fairness in legislative redistricting, such
-as \emph{partisan bias} as the deviation from fairness and
-\emph{electoral responsiveness} which indexes how party control of
-legislative seats responds to changes in a party's success at the
-polls even in a fair system.  (A uniform consensus has existed in the
-academic literature since at least \citet{KinBro87} on partisan
-symmetry as a standard for fairness, and even the U.S.  Supreme Court
-now appears to agree; see \citealt{GroKin07}.)  \JudgeIt also estimates
-and graphs seats-votes curves, make specific vote and seat
-predictions for individual districts, and calculate numerous other
-relevant statistics.
+\JudgeIt allows a user to construct a model of a two-party election system over multiple election cycles, derive quantities of interest about the system through statistical estimation and simulation, and produce output summary statistics and graphical plots of those quantities.  Some of the quantities of interest are based on partisan symmetry as a standard of fairness in legislative redistricting, such as \emph{partisan bias} as the deviation from fairness and \emph{electoral responsiveness} which indexes how party control of legislative seats responds to changes in a party's success at the polls even in a fair system.  (A uniform consensus has existed in the academic literature since at least \citet{KinBro87} on partisan symmetry as a standard for fairness, and even the U.S. Supreme Court now appears to agree; see \citealt{GroKin07}.)  \JudgeIt also estimates and graphs seats-votes curves, make specific vote and seat predictions for individual districts, and calculate numerous other relevant statistics.
 
 The program can evaluate electoral systems in three general situations:
 \begin{enumerate}
 \item When an election already has taken place,
-\item When an election has not been held yet but a new redistricting
-  plan (or plans) has been proposed or implemented, and
-\item When you wish to assess what an election would have been like if
-  held under certain specified counterfactual conditions (such as if
-  no minority districts had been drawn, or term limitations had
-  prevented incumbents from running for reelection).
+\item When an election has not been held yet but a new redistricting plan (or plans) has been proposed or implemented, and
+\item When you wish to assess what an election would have been like if held under certain specified counterfactual conditions (such as if no minority districts had been drawn, or term limitations had prevented incumbents from running for reelection).
 \end{enumerate}
 
-For bias, responsiveness, seats-votes curves, and virtually every
-other estimate, \JudgeIt provides quantitative estimates of uncertainty
-(i.e., standard errors or confidence intervals).  This are recognized
-as essential by social scientists and even the Supreme Court (see
-Castaneda v.  Partida, 430 U.S. 482, 1977, and Hazelwood School
-District v. United States, 433 U.S. 299, 1977).
+For bias, responsiveness, seats-votes curves, and virtually every other estimate, \JudgeIt provides quantitative estimates of uncertainty (i.e., standard errors or confidence intervals).  This are recognized as essential by social scientists and even the Supreme Court (see Castaneda v.  Partida, 430 U.S. 482, 1977, and Hazelwood School District v. United States, 433 U.S. 299, 1977).
 
 \section{Installation Instructions and Requirements}
 
-As this version of \JudgeIt has been built as a package for the
-mathematical software R, it is necessary to install this software
-before beginning.
+As this version of \JudgeIt has been built as a package for the mathematical software R, it is necessary to install this software before beginning.
 
-The latest version of R is available for free from
-\url{http://www.r-project.org}. After installation, retrieve the
-\JudgeIt package through the following command:
+The latest version of R is available for free from \url{http://www.r-project.org}. After installation, retrieve the \JudgeIt package through the following command:
 
 \begin{verbatim}
-> install.packages("JudgeIt", repos = "http://gking.harvard.edu")
+> install.packages("JudgeIt")
 \end{verbatim}
 
 To use the commands within, type
+
 \begin{verbatim}
 > library(JudgeIt)
 \end{verbatim}.
@@ -127,235 +93,164 @@ To use the commands within, type
 \JudgeIt requires the R package \texttt{mvtnorm} to function properly,
 and will load it automatically when needed.
 
-\subsection{Case Syntax}
+\subsection*{Case Syntax}
 
-In all instances, the stylized \JudgeIt refers to the software; the mixed case \textbf{JudgeIt} refers explicitly to the library name; and the lower case \jud is used for the primary analysis function and any contained terms,
-such as \texttt{judgeit.object}.
+In all instances, the stylized \JudgeIt refers to the software; the mixed case \textbf{JudgeIt} refers explicitly to the library name; and the lower case \jud is used for the primary analysis function and any contained terms, such as \texttt{judgeit.object}.
 
 \section{Usage Overview}
 
 \JudgeIt can conduct three types of analyses:
+
 \begin{enumerate}
-\item Evaluation, wherein the information gathered from one year's
-  elections is applied to itself. This is done to suggest the
-  underlying structure of an electoral system.
+\item Evaluation, wherein the information gathered from one year's elections is applied to itself. This is done to suggest the underlying structure of an electoral system.
 
-\item Prediction, which takes a set of observed covariates and
-  predicts the outcome of an election. This can be done with or
-  without the previous election's results and covariates included explicitly.
+\item Prediction, which takes a set of observed covariates and predicts the outcome of an election. This can be done with or without the previous election's results and covariates included explicitly.
 
-\item Counterfactual analysis, which estimates the results if the
-  election had been run under different circumstances (i.e. with
-  different predictors.)
+\item Counterfactual analysis, which estimates the results if the election had been run under different circumstances (i.e. with different predictors.)
 \end{enumerate}
 
-The \JudgeIt interface requires only \textbf{one} command to perform
-analyses, called \jud. The standard auxiliary functions
-\texttt{summary}, \texttt{print} and \texttt{plot} have been adapted
-to display the object that results.
-
-Two steps are required to perform a \JudgeIt analysis: election data
-must be loaded into a \JudgeIt object, and the routine for analysis
-must be specified along with its required options.
+Two steps are required to perform a \JudgeIt analysis: election data must be loaded into a \JudgeIt object, and a choice of analysis must be specified along with its required options.
 
 \section{Formatting Data Sets}
 
-\JudgeIt requires each election to be reported in an object of type
-\texttt{data.frame}.  This is natural if your data is in a
-comma-separated or tab-delimited file, since operations like
+\JudgeIt requires each election to be reported in an object of type \texttt{data.frame}.  This is natural if your data is in a comma-separated or tab-delimited file, since operations like
+
 \begin{verbatim}
 data <- read.csv("ohio.csv")
 data2 <- read.table("cali98.txt")
 \end{verbatim}
-will automatically put these tables into the data frame format. It
-is important to make sure that each variable is labeled before using
-it in the function \jud, either by making the first line
-of the data file contain variable names, or by assigning them afterwards.
-For example:
+
+will automatically put these tables into the data frame format. It is important to make sure that each variable is labeled before using it in the function \jud, either by making the first line of the data file contain variable names, or by assigning them afterwards. For example:
+
 \begin{verbatim}
 data <- read.csv("ohio.csv",header=FALSE)
 colnames(data) <- c("district","vote","inc")
 \end{verbatim}
 
-Since most \JudgeIt analyses will involve a series of consecutive
-elections, \jud accepts such a series as an object of type
-\texttt{list}. Suppose we have three elections, say Ohio's State
-Legislature in 1992, 1994 and 1996, and that each election is stored
-in a data frame as above. To integrate the separate data frames, use
-the command \texttt{elections <- list(oh1992,oh1994,oh1996)} which
-will create an object named ``elections".  Each year's election data
-\emph{must} use the same variable names, so that \JudgeIt can recognize
-the same quantity across different elections.
+Since most \JudgeIt analyses will involve a series of consecutive elections, \jud accepts such a series as an object of type \texttt{list}. Suppose we have three elections, say Ohio's State Legislature in 1992, 1994 and 1996, and that each election is stored in a data frame as above. To integrate the separate data frames, use the command \texttt{elections <- list(oh1992,oh1994,oh1996)} which will create an object named ``elections". Each year's election data \emph{must} use the same variable names, so that \JudgeIt can recognize the same quantity across different elections.
 
 \section{Included Data Sets}
 
-\JudgeIt comes with data set ICSPR 6311, coded as \texttt{house6311},
-containing the results for the U.S. House of Representatives from
-1896 through 1992. It is formatted as a list of 49 data frames, each
-named for their election year, and containing six vectors:
+\JudgeIt comes with data set ICSPR 6311, coded as \texttt{house6311}, containing the results for the U.S. House of Representatives from 1896 through 1992. It is formatted as a list of 49 data frames, each named for their election year, and containing six vectors:
+
 \begin{itemize}
-\item \texttt{STATE}, a numerical ICPSR state code for the state
-  containing the district;
+\item \texttt{STATE}, a numerical ICPSR state code for the state containing the district;
 
-\item \texttt{DIST}, a numerical indicator for the number of the
-  district within the state;
+\item \texttt{DIST}, a numerical indicator for the number of the district within the state;
 
-\item \texttt{INC}, an incumbency indicator, $-1$ for Republican and 1
-  for Democrat;
+\item \texttt{INC}, an incumbency indicator, $-1$ for Republican and 1 for Democrat;
 
-\item \texttt{VOTE}, the share of the vote received by the Democratic
-  candidate;
+\item \texttt{VOTE}, the share of the vote received by the Democratic candidate;
 
-\item \texttt{TURNOUT}, the number of votes for the two candidates
-  combined, and
+\item \texttt{TURNOUT}, the number of votes for the two candidates combined, and
 
-\item \texttt{DELSOUTH}, an indicator for whether the district is
-  located in the South.
+\item \texttt{DELSOUTH}, an indicator for whether the district is located in the South.
 \end{itemize}
 
 \section{Step 1: Create a \JudgeIt object}
 
-Now that there is an object containing the elections we wish to
-analyze, we can load this object into \JudgeIt.  To do this:
+Now that there is an object containing the elections we wish to analyze, we can load this object into \JudgeIt. To do this:
+
 \begin{quote}
 \begin{verbatim}
 judg.obj <-
-judgeit(model.formula=vote ~ predictor1 + predictor2 + modfun(vote),
+judgeit(model.formula=vote ~ predictor1 + predictor2 + some.function(predictor3),
     data=elections, vote.formula=cbind(turnout,eligible)~seats, ...) }
 \end{verbatim}
 \end{quote}
 
-\noindent where the ellipsis ``\texttt{...}'' represents other possible
-commands used by the R command \texttt{model.frame}.
+\noindent where the ellipsis ``\texttt{...}'' represents other possible commands used by the R command \texttt{model.frame}. The user may also apply a function to a variable in the data set as seen by \texttt{some.function(...)}
 
 \subsubsection*{Model Formula}
 
-The model formula, \texttt{model.formula}, specifies the system's outcome
-variable --- the \emph{proportion} of the two-party vote received by
-the candidate for a specified party --- and any desired predictors,
-such as incumbency status.  The predictor names must be the same as
-the variable names within the data list (referred to here as
-\texttt{elections}.)
+The model formula, \texttt{model.formula}, specifies the system's outcome variable --- the \emph{proportion} of the two-party vote received by the candidate for a specified party --- and any desired predictors, such as incumbency status.  The predictor names must be the same as the variable names within the data list (referred to here as \texttt{elections}.)
 
-Functions can also be applied to the variables within the formula.
-For example, if we wish to create an indicator for whether a win is
-decisive (for example, the winner more than triples the opponent's
-votes), we first create such a function,
+Functions can also be applied to the variables within the formula. For example, if we wish to create an indicator for whether a win is decisive (for example, the winner more than triples the loser's vote share), we first create such a function,
 
 \begin{quote}
-\texttt{modfun <- function(arg) -1*(arg<0.25)+1*(arg>0.75)}
+\texttt{some.function <- function(arg) -1*(arg<0.25)+1*(arg>0.75)}
 \end{quote}
 
 and then use it in the formula.  For example, with data set \texttt{house6311}
-this formula works: \texttt{model.formula=VOTE\~{}INC+modfun(VOTE)}.
+this formula works: \texttt{model.formula=VOTE\~{}INC+some.function(VOTE)}.
 
 \subsubsection*{Voter Formula}
 
-We use the voter formula, \texttt{vote.formula}, to indicate the
-\emph{number} of actual voters (also known as the turnout), the number of
-eligible voters, and/or the number of seats each district elects to
-the main assembly. If this is omitted, the number of seats is assumed
-to be one per district and the turnout is assumed to be equal in all
-districts.
+We use the voter formula, \texttt{vote.formula}, to indicate the \emph{number} of actual voters (also known as the turnout), the number of eligible voters, and/or the number of seats each district elects to the main assembly. If this is omitted, the number of seats is assumed to be one per district and the turnout is assumed to be equal in all districts.
 
 For example,
 \begin{itemize}
-\item \texttt{vote.formula=cbind(turnout,eligible)\~{}seats} specifies all
-  three quantities.
+\item \texttt{vote.formula=cbind(turnout,eligible)\~{}seats} specifies all three quantities.
 
-\item \texttt{vote.formula=cbind(turnout,eligible)\~{}1} specifies turnout
-  and eligible voters, and one seat per district.
+\item \texttt{vote.formula=cbind(turnout,eligible)\~{}1} specifies turnout and eligible voters, and one seat per district.
 
-\item \texttt{vote.formula=turnout\~{}1} specifies turnout. The number of
-  eligible voters is ignored, and seats are specified at one per
-  district.
+\item \texttt{vote.formula=turnout\~{}1} specifies turnout. The number of eligible voters is ignored, and seats are specified at one per district.
 
 \item \texttt{vote.formula=\~{}1} is the default option.
 \end{itemize}
 
-\subsection{Other Options}
+\subsubsection*{Specifying Populations of Groups}
 
-\subsubsection{Selecting a data subset}
-
-For example, the data set \texttt{house6311} contains an indicator
-\texttt{DELSOUTH}, which is 1 if a district is located in the south
-and 0 otherwise.  To perform analyses on non-southern districts only,
-initialize a JudgeIt object (in this example, \texttt{jud.ob}) with the expression
+The routine \texttt{voting.power} allows the user to investigate the probability that a member of a particular group would have on changing an election result. To specify the groups present in the system, use the formula option
 
 \begin{quote}
-\texttt{jud.ob <- judgeit(...,subset=DELSOUTH==0,...,data=house6311)}
+\texttt{pop.groups=\~{}farmers+white.collars+clowns+statisticians}
 \end{quote}
 
-\subsubsection{Automatic Use of Previous Year's Results}
+substituting whichever groups desired for the analysis. (The tilde \~{} is necessary!)
 
-The results of a previous year's election is often among the best
-predictors of a current contest, and they are included by default. To
-remove this option, include the option \texttt{use.last.votes=F} in
-your \jud statement.
+\subsection*{Other Options}
 
-\subsubsection{Redistricting}
+\subsubsection*{Selecting a data subset}
 
-At some point during a state's existence, the electoral map is redrawn
-to adjust for changes in the demographics of the districts.
-Specifying whether the districts in one election are identical to the
-previous one are vital to an accurate representation of the system.
+It is possible to choose a subset of the data for analysis in each year. For example, the data set \texttt{house6311} contains an indicator \texttt{DELSOUTH}, which is 1 if a district is located in the south and 0 otherwise.  To perform analyses on non-southern districts only, initialize a JudgeIt object (in this example, \texttt{jud.ob}) with the expression
+
+\begin{quote}
+\texttt{jud.ob <- judgeit(...,subset=DELSOUTH==0,data=house6311)}
+\end{quote}
+
+\subsubsection*{Automatic Use of Previous Year's Results}
+
+The results of a previous year's election is often among the best predictors of a current contest, and they are included by default. To remove this option, include the option \texttt{use.last.votes=FALSE} in your \jud statement.
+
+\subsubsection*{Redistricting}
+
+At some point during a state's existence, the electoral map is redrawn to adjust for changes in the demographics of the districts. Specifying whether the districts in one election are identical to the previous one are vital to an accurate representation of the system.
 
 By default, \jud assumes that if two consecutive years have the same number of districts in the map, then no redistricting has taken place.
 
-To set a redistricting occurrence manually, \jud accepts
-as an option \texttt{same.districts}, which indicates whether the
-previous election used the same districting plan. In many states in
-the American system, the easiest way to do this is to have a variable
-specifying the election years and note whether the year ends in 2
-\texttt{(year \%\% 10 == 2)}.  For other situations, you will need to
-add a specially coded variable to the data frame and set
-\texttt{same.districts} to it.
+To set a redistricting occurrence manually, \jud accepts as an option \texttt{same.districts}, which indicates whether the previous election used the same districting plan. In many states in the American system, the easiest way to do this is to have a variable specifying the election years and note whether the year ends in 2 \texttt{(year \%\% 10 == 2)}.  For other situations, you will need to add a specially coded variable to the data frame and set \texttt{same.districts} to this value.
 
-\subsubsection{Uncontested Districts}
+\subsubsection*{Uncontested Districts}
 
-\JudgeIt includes several routines to deal with uncontested districts.
-By default \JudgeIt assumes that a vote proportion below 0.05 or above 0.95
-indicates an uncontested district and are imputed; these levels can be
-changes using the options \texttt{uncontested.low} and
-\texttt{uncontested.high}.
+\JudgeIt includes several routines to deal with uncontested districts. By default \JudgeIt assumes that a vote proportion below 0.05 or above 0.95 indicates an uncontested district and are fixed to default alternate values; these levels can be changes using the options \texttt{uncontested.low} and \texttt{uncontested.high}.
 
-The option \texttt{uncontesteds.method} indicates which method is to be used
-to deal with districts tagged as uncontested:
+The option \texttt{uncontesteds.method} indicates which method is to be used to deal with districts tagged as uncontested:
+
 \begin{itemize}
-\item \texttt{"default"}, which replaces uncontested values with
-  assumed vote totals specified by \textbf{uncontested.low.new} and
-  \textbf{uncontested.high.new} (default values are 25\% and 75\%);
+\item \texttt{"default"}, which replaces uncontested values with assumed vote totals specified by \textbf{uncontested.low.new} and \textbf{uncontested.high.new} (default values are 25\% and 75\%);
 
-\item \texttt{"impute"}, which uses the behaviour of contested
-  districts to estimate unknown vote shares,
+\item \texttt{"impute"}, which uses the behaviour of contested districts to estimate unknown vote shares,
 
-\item \texttt{"remove"}, which simply eliminates uncontested districts
-  from the analysis, or
+\item \texttt{"remove"}, which simply eliminates uncontested districts from the analysis, or
 
 \item \texttt{"nochange"} which leaves the vote variable as entered.
 \end{itemize}
 
-\subsubsection{Simulation Parameters}
+\subsubsection*{Simulation Parameters}
 
-JudgeIt analyzes election systems by simulating a number of
-hypothetical draws of the election of interest, and computing
-quantities of interest from these simulations. The default number of simulated elections is 1000; to change this, include the option \texttt{simulations} in the \jud command.
+\JudgeIt analyzes election systems by simulating a number of hypothetical draws of the election of interest, and computing quantities of interest from these simulations. The default number of simulated elections is 201; to change this, include the option \texttt{simulations} in the \jud command.
 
-\subsubsection{Applying District Weights: Some Count More than Others}
+\subsubsection*{Applying District Weights: Some Count More than Others}
 
-Districts may have different influence than others when determining
-the parameters of a system. To reflect this, we can assign a
-\texttt{weight} parameter to command \jud:
+Districts may have different influence than others when determining the parameters of a system. To reflect this, we can assign a \texttt{weight} parameter to command \jud:
 
 \begin{itemize}
-\item \texttt{weight=constant} (default) in which all districts have equal
-weight;
+\item \texttt{weight=constant} (default) in which all districts have equal weight;
 
-\item \texttt{weight=turnout}, corresponding to the two-party votes cast in each
-district;
+\item \texttt{weight=turnout}, corresponding to the two-party votes cast in each district;
 
-\item \texttt{weight=eligible.voters}, corresponding to the total number of eligible voters
-in each district, or
+\item \texttt{weight=eligible.voters}, corresponding to the total number of eligible voters in each district, or
 
 \item \texttt{weight=seats}, the number of seats in each district.
 \end{itemize}
@@ -364,169 +259,122 @@ This will have two distinct impacts on the analysis. First, in the linear modell
 
 \section{Step 2: Conduct Analyses}
 
-Once an election system has been loaded into a \JudgeIt object,
-quantities of interest can be simulated. There are three types of
-analyses than can be performed:
+Once an election system has been loaded into a \JudgeIt object, quantities of interest can be simulated. There are three types of analyses than can be performed:
 
-\subsection{Evaluation}
+\subsection*{Evaluation}
 
-The default setting of \JudgeIt for analysis, evaluation mode
-examines an election under the actual conditions that took place.
-Under these conditions, the systematic error component in simulation
-(the amount estimated by the parameter $\lambda$) is identical, and
-total error estimates are therefore smaller.
+The default setting of \JudgeIt for analysis, evaluation mode examines an election under the actual conditions that took place. Under these conditions, the systematic error component in simulation (the amount estimated by the parameter $\lambda$) is identical, and total error estimates are therefore smaller.
 
-By default, all substantive outputs from \jud use
-evaluation mode. For example, using a previously created \JudgeIt
-object \texttt{judgeit.object}, we can obtain a seats-votes curve
-using the command
+By default, all substantive outputs from \jud use evaluation mode. For example, using a previously created \JudgeIt object \texttt{judgeit.object}, we can obtain a seats-votes curve using the command
 
 \begin{quote} \texttt{
-plot(judgeit(routine="seats",judgeit.object=judgeit.object))}
+plot(seats(judgeit.object))}
 \end{quote}
 
-\subsection{Prediction}
+\subsection*{Prediction}
 
-Prediction takes the information gleaned from one election and uses
-it to forecast the results of a new election. In this case, since the new election hasn't taken place, the systematic error component is inestimable, and the total error component is generated.
+Prediction takes the information gleaned from one election and uses it to forecast the results of a new election. In this case, since the new election hasn't taken place, the systematic error component is inestimable, and the total error component is generated.
 
-To enable predictive mode, add the option \texttt{predict=T} to a
-\jud analysis command. To specify new covariates for
-this election, add the option \texttt{new.covariates} to specify the
-new conditions, or use \texttt{new.covariate.matrix} to draw a new electoral map entirely.
+To enable predictive mode, add the option \texttt{predict=TRUE} to a \jud analysis command. To specify new covariates for this election, add the option \texttt{new.covariates} to specify the new conditions, or use \texttt{new.covariate.matrix} to draw a new electoral map entirely.
 
-\subsection{Counterfactual Evaluation}
+\subsection*{Counterfactual Evaluation}
 
-This option supposes what might have happened if an election were
-rerun under different circumstances. The systematic error component
-is once again held constant to reflect that this is the same
-``voting apparatus'' as was used originally.
+This option supposes what might have happened if an election were rerun under different circumstances. The systematic error component is once again held constant to reflect that this is the same ``voting apparatus'' as was used originally.
 
-To enable a counterfactual analysis, specify new covariates by
-adding the option \texttt{new.covariates} and changing the relevant values.
+To enable a counterfactual analysis, specify new covariates by adding the option \texttt{new.covariates} and changing the relevant values.
 
-\subsection{Using new.covariates to recode data}
+\subsection*{Using new.covariates to recode data}
 
-In order to recode the data for counterfactual analysis or
-prediction, the option \texttt{new.predictors} must be added to a
-\jud analysis command.
+In order to recode the data for counterfactual analysis or prediction, the option \texttt{new.predictors} must be added to a \jud analysis command.
 
-As an example, suppose we wish to find out what were happened if term
-limits were imposed and no incumbent could run for re-election, and
-that the incumbency indicator is labelled \texttt{INC}. The option
+As an example, suppose we wish to find out what were happened if term limits were imposed and no incumbent could run for re-election, and that the incumbency indicator is labelled \texttt{INC}. The option
 
 \begin{quote} \texttt{new.covariates=list("INC",0)} \end{quote}
 
 would instruct each routine to use this counterfactual data.
 
-Suppose it came to pass that, instead, a group of representatives were
-forced to resign shortly before the election. If the new incumbency
-indicators are stored in a variable \texttt{new.incs},
+Suppose it came to pass that, instead, a group of representatives were forced to resign shortly before the election. If the new incumbency indicators are stored in a variable \texttt{new.incs},
 
 \begin{quote} \texttt{new.covariates=list("INC",new.incs)} \end{quote}
 
-would make that substitution. Make sure, however, that the
-substitution variable has the same number of districts as the model
-for that year; to confirm this, run the command
+would make that substitution. Make sure, however, that the substitution variable has the same number of districts as the model for that year; to confirm this, run the command
 
 \begin{quote} \texttt{summary(judgeit.object,year)}. \end{quote}
 
-\subsection{distreport: Examine the estimation}
+\subsection*{district.report: Examine the estimation}
 
-The output of this routine is a reckoning of each district, including
-the observed and hypothetical vote shares, the standard deviation of
-the hypothetical estimate, and the probability that a voter in this
-district would be able to change the outcome of the entire election by
-reversing their vote.
+The output of this routine is a reckoning of each district, including the observed and hypothetical vote shares, the standard deviation of the hypothetical estimate, and the probability that a voter in this district would be able to change the outcome of the entire election by reversing their vote.
 
-\subsection{seats: Given a vote share, determine the seat share}
+To run a district report, run the command
 
-This is the basic tool used to determine the conversion between seats
-and votes in this electoral system.
+\begin{quote} \texttt{district.report(judgeit.object)}. \end{quote}
+
+By default the command will run a report for the last year in the system; to specify a year to analyze, add the option \textit{year=1992} substituting whichever year desired.
+
+\subsection*{seats: Given a vote share, determine the seat share}
+
+This is the basic tool used to determine the relationship between votes and seats in an electoral system.
 
 \textbf{Example:}
-\jud\texttt{(routine=``seats",judgeit.object=j.ob)} will produce
-estimations and errors for the fraction of seats received using the
-default options: in particular, in the final election in the system,
-at various values between 0.45 and 0.55.
+\texttt{seats(j.ob)} will produce estimations and errors for the fraction of seats received using the default options; in particular, in the final election in the system, at various values around the observed average vote.
 
-\textbf{Example:} \jud\texttt{(routine="seats", judgeit.object=j.ob,voterange=c(0.1,0.9))} will now produce estimates
-over a much wider vote range. Note that the farther we get from the
-actual outcome, the less reliable the model will become.
-
-\subsubsection{Plotting a seats-votes curve}
+\subsubsection*{Plotting a seats-votes curve}
 
 If the output in a \JudgeIt object was produced by \texttt{seats}, the
 \texttt{plot()} command will recognize this and produce a seats-votes
 curve.
 
-\subsection{prob: Given a vote share, determine the probability of an electoral win}
+\textbf{Example:}
+\texttt{plot(seats(j.ob))} will plot the seats-votes curve for values in the last year in the system.
 
-As above, but replace ``seats" with ``likelihood of a majority for
-party 1".
+\subsection*{seats.with.prob: Determine the fraction of seats whose win probabilities lie within a chosen range.}
 
-\textbf{Example:} \texttt{judgeit(routine="prob",judgeit.object=j.ob)}
-will produce estimations and errors for the fraction of seats received
-using the default options: in particular, in the final election in the
-system, at various values between 0.45 and 0.55.
+\textbf{Example:} \texttt{seats.with.prob(j.ob)} will produce estimations and errors for the fraction of seats received using the default options: in particular, in the final election in the system, with various average vote values between 0.45 and 0.55.
 
-\textbf{Example:} \texttt{judgeit(routine="prob",judgeit.object=j.ob,voterange=c(0.1,0.9))}
-will now produce estimates over a much wider vote range. Note that the
-farther we get from the actual outcome, the less reliable the model
-will become.
+\subsection*{results.prob: Given a vote share or deviation, determine the probability that the seat share is within a particular margin}
 
-\subsection{winprob: Given a vote share or deviation, determine the probability that the seat share is within a particular margin}
+\textbf{Example:} \texttt{results.prob(j.ob)} does the default: For the vote as it is, what is the probability that the seat share will be between the default range of 0.45 to 0.55?
 
 \textbf{Example:}
-\texttt{judgeit(routine="winprob",judgeit.object=j.ob)} does the
-default: For the vote as it is, what is the probability that the seat
-share will be between the default range of 0.45 to 0.55?
+\begin{quote} \texttt{results.prob(j.ob,shift.in.votes=-0.05)} \end{quote} 
+determines what the probability is that the seat share will be between the default range of 0.45 to 0.55, given that the resulting vote share was 5 points lower than actually experienced.
 
 \textbf{Example:}
-\begin{quote} \texttt{judgeit(routine="winprob",judgeit.object=j.ob, \\
-  voteorshift="shift",voteshares=-0.05)} \end{quote} determines what the
-probability is that the seat share will be between the default range
-of 0.45 to 0.55, given that the resulting vote share was 5 points
-lower than actually experienced.
+\begin{quote}\texttt{results.prob(j.ob,vote.range=c(0,0.5),mean.votes=0.5)} \end{quote}
+
+determines what the probability is that the seat share for Party 1 will be below 50 percent, given that the resulting vote share was 50 percent for each party.
+
+\subsection*{bias.resp, or svsum: Determine partisan bias and responsiveness}
+
+The output is a table containing the estimates and errors for four quantities: Partisan bias at an even vote, both instantaneous and averaged over a 10-point swing, and responsiveness at the midpoint and the observed vote percentage.
 
 \textbf{Example:}
-\begin{quote}\texttt{judgeit(routine="winprob",judgeit.object=j.ob, \\
-voterange=c(0,0.5),voteorshift="vote",voteshares=0.5)} \end{quote}
-determines what the probability is that the seat share will be below
-50 percent, given that the resulting vote share was 50 percent for
-each party.
+\begin{quote} \texttt{bias.resp(j.ob,year=1976)} \end{quote}
 
-\subsection{svsum: Determine partisan bias and responsiveness}
+will output those properties for the election held in 1976. (This assumes that the judgeit object \texttt{j.ob} is specified to include the calendar years of each election.)
 
-The title says it all. The output is a 4-by-2 table containing the
-estimates and errors for four quantities: Partisan bias at an even
-vote, both instantaneous and averaged over a 10-point swing, and
-responsiveness at the midpoint and the observed vote percentage.
+\subsection*{votes.for.result, or winvote: Given a probability of victory, determine the total vote share required to attain it}
+
+The reverse procedure of \texttt{results.prob}, if the seat share was between 0.5 and 1. 
 
 \textbf{Example:}
-\begin{quote} \texttt{judgeit(routine="svsum",judgeit.object=j.ob,year=which(elecyears==1976))} \end{quote}
-will output those properties for the election held in 1976. (This
-assumes there is a variable called \texttt{elecyears} which encodes
-the calendar years of each election.)
+\begin{quote} \texttt{votes.for.result(j.ob,prob.win=0.7)} \end{quote}
 
-\subsection{winvote: Given a seat share, determine the total vote share required to attain it}
+outputs the expected vote percentage needed for a 70\% chance of victory.
 
-The reverse procedure of \texttt{seats}. \textbf{Example:}
-\begin{quote} \texttt{judgeit(routine="winvote", judgeit.object=j.ob,winvote=0.7)} \end{quote}
-outputs the expected vote percentage needed to get 70\% of the seats.
-
-\subsection{voting.power: Determine the power that distinct groups have in changing an election result}
+\subsection*{voting.power: Determine the power that distinct groups have in changing an election result}
 
 Suppose there exists a distinct number of groups spread across the districts of an electoral map (by race, language, or some other delineation.) The routine \texttt{voting.power} calculates the power of an electoral group by estimating the probability that a vote from this group has in changing the result of an election, by flipping the outcome of districts in which they live.
 
-\textbf{Example:}
-\begin{quote} \texttt{judgeit(routine="voting.power", judgeit.object=j.ob,voting.groups=matrix1,all.groups=matrix2)} \end{quote}
+If the option \texttt{pop.groups} is specified in the original \jud command, no further options are required. If not, use the syntax
 
-\texttt{matrix1} represents the voters in each group within each district; \texttt{matrix2} represents the eligible voters respectively. Each must have the same number of rows as there are districts in the system.
+\begin{quote} \texttt{voting.power(j.ob,new.pop.groups=matrix1)} \end{quote}
+
+where \texttt{matrix1} represents the voters in each group within each district.
 
 \section{Further \JudgeIt output options}
 
-\subsection{System summaries}
+\subsection*{System summaries}
 
 Using the command \texttt{summary()} on a \JudgeIt object will give one
 of two results. Without a year given, the output will be the number of
@@ -610,46 +458,94 @@ as given above.
 
 \appendix
 
-\section{Several demos}
+\section{The Underlying Method}
 
-After loading the JudgeIt library, you may run these commands to check
-that it's in working order.
+\subsection*{Sources of Error in Electoral Data}
+In principle, the source of error in an experimental outcome can be divided into systematic error, in which the apparatus for conducting an experiment skews the result in the same way each time it is run, and random error, which is different every time an experiment is conducted. In many cases in political science, the estimated error in an experiment cannot be divided into its two component types.
 
-In addition, the demonstrations \texttt{seatsdemo, probdemo,
+In the application of two-party elections, however, the ``experimental apparatus'' to be considered is an electoral system that changes minimally between elections in its construction. This gives us a method for estimating what fraction of an election's variation is caused by properties of the system, and what changes can be considered to be random in nature.
+
+Under this assumption, two different types of elections can be simulated: those in which the existing system is no longer in place, such as the prediction of future elections, and those in which we consider what would happen whether a particular election was run again using the same systematic conditions, two fundamentally different sets of analyses with a common method of generation.
+
+Quantities of interest in the political science literature can often be explained in terms of the outcomes of hypothetical elections or properties of the election system. 
+
+\subsection*{The Gelman-King Model}
+
+JudgeIt is used to model two-party electoral systems; choose one party to identify as ``Party 1''. (All results for Party 2 are clearly the opposite for those of Party 1.) 
+
+In any particular election year, let $v_i$ be the share of the two-party vote received by Party 1 in district $i$. We model the resulting vote share as
+
+\[ v_i = X_i'\beta + \gamma_i + \varepsilon_i \]
+
+\noindent where $X_i'$ is a vector of predictor variables with coefficient $\beta$, and $\gamma_i \sim N(0,\lambda \sigma^2)$ and $\varepsilon_i \sim N(0,(1-\lambda) \sigma^2)$ are the systematic and random error terms. In this presentation, $\sigma^2$ is the total error variance, and $\lambda$ is the share attributed to the systematic error component. The error terms in each district are independent of each other and of those in each other district in the system.
+
+%weights!
+
+The standard approach to estimating the unknown quantities is to model each year under the Bayesian framework, with noninformative priors on the $\beta$ and $\sigma^2$ parameters in each year. To estimate $\sigma^2$, take the total variance estimate in each year and pool those estimates together; then use the mean of the pooled estimates as the value of $\sigma^2$ as the value for each election. 
+
+To estimate $\lambda$ for the electoral system, note that the systematic component of the error is proportional to the votes received in each district in two subsequent elections, yielding 
+
+\[ v_{i,t+1} = \lambda v_{i,t} + X_i'\beta + \gamma_i + \varepsilon_i, \]
+
+\noindent where $X_i'$ may include as many variables as are available from elections $t$ and $t+1$. The value of $\lambda$ used is the mean of these estimated values. Note that estimates of $\lambda$ can only be obtained when two subsequent elections use the same electoral map, i.e. no redistricting has taken place.
+
+%% Note to future JudgeIt maintenance: when do we want to go to a partial-pooling model, through Empirical Bayes or the like? See how different they are... just impute them in years where we don't know them. This could be a huge impact. We should check it out soon.
+
+\subsubsection*{Generating Hypothetical Elections}
+
+Now that the parameters in each election year are estimated, the model can be simulated. For a predictive analysis, the hypothetical vote share in each district is found to be
+
+\[ \tilde{v_i} = \tilde{X_i'}\beta + \tilde{\delta} + \tilde{\gamma_i} + \tilde{\varepsilon_i} \]
+
+\noindent where $\tilde{X_i'}$ is a (possibly new) vector of predictors corresponding to those terms in $\beta$. In this case, the two error terms are unidentifiable and once again combine so that 
+
+\[ \tilde{\gamma_i} + \tilde{\varepsilon_i} \sim N(0,\sigma^2). \]
+
+The $\tilde{\delta}$ term is added under the \textit{general uniform partisan swing} assumption; that is, for small deviations from the observed outcome, a swing in the overall vote share can be represented as the same swing in each district in the system. This allows the user to investigate two scenarios: what would happen if the average vote were to shift by a small amount, or what the electoral map would look like with a particular average vote share (corresponding to a particular shift in the average vote.)
+
+For an evaluation of an election's underlying properties, or to examine what would happen if we re-ran the election under counterfactual circumstances, we note that the systematic error component $\gamma_i$ can be estimated using the data. Since $y_i$ and $\gamma_i$ are simulated from the bivariate normal distribution,
+
+\[ \left[ \begin{array}{c} y_i \\ \gamma_i \end{array} \right] \sim N_2 \left( \left[ \begin{array}{c} X_i\beta \\ 0 \end{array} \right], \left[ \begin{array}{cc} \sigma^2 & \lambda \sigma^2 \\ \lambda \sigma^2 & \lambda \sigma^2 \end{array} \right] \right), \]
+
+\noindent we can obtain the conditional distribution,
+
+\[ \gamma_i|y_i \sim N(\lambda(y_i-x_i'\beta),\lambda(1-\lambda)\sigma^2). \]
+
+We then use this estimate of $\gamma_i$ in the simulation equation
+
+\[ \tilde{v_i} = \tilde{X_i'}\beta + \tilde{\delta} + \gamma_i + \tilde{\varepsilon_i}. \]
+
+Note that Party 1 wins the election if their share of the two-party vote is greater than one-half. Given $\beta$ and $\gamma$, we then see that the expected seat share is
+
+\[ P(v_i>0.5|\beta,\gamma,\delta) = 1-\Phi\left( \frac{0.5-\tilde{X_i'}\beta-\tilde{\delta} + \gamma_i}{\sqrt{(1-\lambda) \sigma^2}} \right). \]
+
+To generate the probability distribution for this quantity, we then draw values for $\beta$ and $\gamma$ given their conditional distributions, and set $\delta$ to its required value given the application.
+
+\subsection*{Application: Calculating Partisan Bias}
+
+One definition of partisan bias is the extra seat share received by one party when the average vote is split equally between both. We estimate the distribution of partisan bias conditional on $\beta$ and $\gamma$, then use their distributions to determine a probability interval.
+
+To get one draw from the distribution of partisan bias:
+
+\begin{itemize}
+
+\item Draw $\beta$ and $\gamma$ from their respective distributions. These represent conditions in the electoral system up until the election.\footnote{The routine used to generate multivariate normal random variables is taken explicitly from the R library MASS.}
+
+\item Calculate the mean and variance of the vote share in each district conditional on the draws of $\beta$ and $\gamma$.
+
+\item Calculate the grand mean vote (with whatever weights are being used) and subtract it from 0.5; this is the value of $\delta$ we use to adjust the mean vote to 0.5.
+
+\item Determine the expected seat share $P(v_i>0.5|\beta,\gamma,\delta)$ for each district and take the weighted mean. Twice the (weighted mean minus 0.5) is the partisan bias conditional on $\beta$ and $\gamma$.
+
+\end{itemize}
+
+Repeating this procedure gives us the distribution of the partisan bias.
+
+\section{Demonstrations}
+
+After loading the JudgeIt library, the demonstrations \texttt{seatsdemo, probdemo,
   distreportdemo} and \texttt{svsumdemo} are available through the
 command \texttt{demo}.
-
-\begin{verbatim}
-
-data(house6311)
-#columns: STATE,DIST,INC,VOTE,TURNOUT,DELSOUTH
-
-#operators:
-unc <- function(inp) -1*(inp<0.05)+1*(inp>0.95)
-
-years <- seq (1896,1992,by=2)
-same.dists <- 1*(yrs%%10!=2)
-
-j.ob <- judgeit(model.formula=VOTE~unc(VOTE)+INC,vote.formula=TURNOUT~1,
-               data=house6311,
-               use.last.votes=T,subset=DELSOUTH==0,same.d=same.dists)
-
-summary(j.ob)
-summary(j.ob,which(house6311$years==1942))
-
-j.ob <- judgeit(routine="distreport",judgeit.object=j.ob,year=which(years==1962),new.covariates=list("INC",0),vote.range=c(0.1,0.9))
-j.ob
-
-#seats-votes curve
-j.ob <- judgeit(routine="seats",jud=j.ob,year=which(years==1986),vote.range=c(0.2,0.8))
-plot(j.ob)
-
-\end{verbatim}
-
-\subsection*{Multivariate Normal Generation}
-
-The routine used to generate multivariate normal random variables is
-taken explicitly from the R library MASS.
 
 %\nocite{Kintho06}
 \bibliographystyle{apsr} \bibsep=0in

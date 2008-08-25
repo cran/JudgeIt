@@ -15,11 +15,9 @@ j.ob <- judgeit(model=VOTE~unc(VOTE)+INC,vote.form=TURNOUT~1,
 
 #run some "prob" routines.
 #What fraction of seats were favored to go Democratic?
-j.ob.1 <- judgeit(judgeit.object=j.ob,routine="prob",probab=c(0.5,1),mean.votes=45:55/100,year=which(elecyears==1946))
+j.ob.1 <- seats.with.prob(j.ob,prob.range=c(0.5,1),mean.votes=45:55/100,year=1946)
 plot(j.ob.1)
 
 #What fraction of seats were tossups?
-j.ob.2 <- judgeit(judgeit.object=j.ob,routine="prob",probab=c(0.4,0.6),mean.votes=45:55/100,year=which(elecyears==1946))
+j.ob.2 <- seats.with.prob(j.ob,prob.range=c(0.4,0.6),mean.votes=45:55/100,year=1946)
 plot(j.ob.2)
-
-#plot(j.ob.1,filename="1944house")

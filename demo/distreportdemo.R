@@ -14,11 +14,17 @@ j.ob <- judgeit(model=VOTE~unc(VOTE)+INC,vote.form=TURNOUT~1,
                     same.d=same.d)
 
 #what happens if...
-plot(judgeit(judgeit.object=j.ob,routine="distreport",year=which(elecyears==1984)))
-judgeit(judgeit.object=j.ob,routine="winvote",winvote=0.52,year=which(elecyears==1984))
+reports <- district.report(j.ob,year=1984)
+plot(reports)
+
+winning <- votes.for.result(j.ob,prob.win=0.52,year=1984)
+head(winning)
 
 #...everyone had quit Congress in 1984?
-plot(judgeit(judgeit.object=j.ob,routine="distreport",new.covariates=list("INC",0),year=which(elecyears==1984)))
-judgeit(judgeit.object=j.ob,routine="winvote",winvote=0.52,new.covariates=list("INC",0),year=which(elecyears==1984))
+reports.2 <- district.report(j.ob,year=1984,new.covariates=list("INC",0))
+head(reports.2)
+
+winning.2 <- winvote(j.ob,prob.win=0.52,year=1984,new.covariates=list("INC",0))
+head(winning.2)
 
 

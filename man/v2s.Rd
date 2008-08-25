@@ -14,6 +14,6 @@ v2s(inp)
 \value{
   1*(inp>0.5)
 }
-\author{ ~~who you are~~ }
-\note{For aid in JudgeIt.}
+\author{Andrew C. Thomas}
+\note{For aid in JudgeIt routines.}
 \keyword{array}

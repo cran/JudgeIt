@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159-1.10b (Web2C 7.4.5) (format=pdflatex 2007.11.9)  17 MAR 2008 16:42
+This is pdfTeX, Version 3.14159-1.10b (Web2C 7.4.5) (format=pdflatex 2007.11.9)  25 AUG 2008 11:44
 **judgeit
 (./judgeit.tex{/usr/share/texmf/pdftex/config/pdftex.cfg}
 LaTeX2e <2001/06/01>
@@ -323,7 +323,7 @@ File: umsb.fd 2002/01/19 v2.2g AMS font definitions
 {/usr/share/texmf/dvips/config/pdftex.map}] (./judgeit.toc
 
 LaTeX Font Warning: Font shape `OT1/cmr/bx/sc' undefined
-(Font)              using `OT1/cmr/bx/n' instead on input line 7.
+(Font)              using `OT1/cmr/bx/n' instead on input line 6.
 
 )
 \tf@toc=\write7
@@ -338,58 +338,34 @@ l.60 \clearpage
                 [1]
 
 Package natbib Warning: Citation `GelKin94a' on page 2 undefined on input line 
-71.
+64.
 
 
-LaTeX Warning: Characters dropped after `\end{verbatim}' on input line 125.
+LaTeX Warning: Characters dropped after `\end{verbatim}' on input line 91.
 
 [2
 
 ]
-LaTeX Font Info:    Try loading font information for OMS+cmr on input line 197.
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 137.
 
  (/usr/share/texmf/tex/latex/base/omscmr.fd
 File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 197.
- [3] [4] [5]
-Overfull \hbox (2.95734pt too wide) in paragraph at lines 405--407
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 137.
+ [3]
+Overfull \hbox (22.81479pt too wide) in paragraph at lines 157--157
+ []/cmtt10/judgeit(model.formula=vote ~ predictor1 + predictor2 + some.function
+(predictor3),[] 
+ []
+
+[4] [5]
+Overfull \hbox (2.95734pt too wide) in paragraph at lines 284--285
 []/cmr10/To en-able a coun-ter-fac-tual anal-y-sis, spec-ify new co-vari-ates b
 y adding the op-tion /cmtt10/new.covariates
  []
 
-[6]
-Overfull \hbox (4.8013pt too wide) in paragraph at lines 453--456
-[]/cmbx10/Example: /cmtt10/judgeit (routine="seats", judgeit.object=j.ob,votera
-nge=c(0.1,0.9)) /cmr10/will
- []
-
-
-Overfull \hbox (0.56523pt too wide) in paragraph at lines 507--507
-[]/cmtt10/judgeit(routine="svsum",judgeit.object=j.ob,year=which(elecyears==197
-6)) 
- []
-
-[7]
-Overfull \hbox (110.81427pt too wide) in paragraph at lines 523--523
-[]/cmtt10/judgeit(routine="voting.power", judgeit.object=j.ob,voting.groups=mat
-rix1,all.groups=matrix2) 
- []
-
-[8]
-Overfull \hbox (265.56242pt too wide) in paragraph at lines 640--640
-[]/cmtt10/j.ob <- judgeit(routine="distreport",judgeit.object=j.ob,year=which(y
-ears==1962),new.covariates=list("INC",0),vote.range=c(0.1,0.9))[] 
- []
-
-
-Overfull \hbox (29.31448pt too wide) in paragraph at lines 644--644
-[]/cmtt10/j.ob <- judgeit(routine="seats",jud=j.ob,year=which(years==1986),vote
-.range=c(0.2,0.8))[] 
- []
-
-(./judgeit.bbl
+[6] [7] [8] [9] [10] (./judgeit.bbl
 Underfull \hbox (badness 2894) in paragraph at lines 4--8
 []/cmr10/Gelman, An-drew and Gary King. 1990/cmti10/a/cmr10/.  ``Es-ti-mat-ing 
 In-cum-bency Ad-van-tage With-
@@ -401,7 +377,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 4--8
 34(4, November):1142--1164.
  []
 
-[9]
+
 Underfull \hbox (badness 5050) in paragraph at lines 17--21
 []/cmr10/Gelman, An-drew and Gary King. 1994.  ``En-hanc-ing Democ-racy Through
  Leg-isla-
@@ -413,7 +389,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 17--21
 w /cmr10/88(3, September):541--559.
  []
 
-
+[11]
 Underfull \hbox (badness 2443) in paragraph at lines 24--30
 []/cmr10/Gelman, An-drew, Jonathan Katz and Gary King. 2004.  /cmti10/Re-think-
 ing the Vote: The
@@ -429,34 +405,36 @@ w York: Ox-ford Uni-ver-
 
 Package natbib Warning: There were undefined citations.
 
-[10] (./judgeit.aux)
+[12] (./judgeit.aux)
 
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
  ) 
 Here is how much of TeX's memory you used:
- 4324 strings out of 95437
- 54221 string characters out of 1190233
- 111784 words of memory out of 1000001
- 7183 multiletter control sequences out of 10000+50000
+ 4312 strings out of 95437
+ 53833 string characters out of 1190233
+ 111822 words of memory out of 1000001
+ 7163 multiletter control sequences out of 10000+50000
  16287 words of font info for 63 fonts, out of 500000 for 1000
  14 hyphenation exceptions out of 1000
- 34i,11n,36p,446b,295s stack positions out of 1500i,500n,5000p,200000b,5000s
- 290 PDF objects out of 300000
- 61 named destinations out of 131072
- 233 words of extra memory for PDF output out of 65536
-{/usr/share/texmf/dvips/tetex/aae443f0.enc}</usr/share/texmf/fonts/type1/blue
-sky/cm/cmmi10.pfb>{/usr/share/texmf/dvips/tetex/bbad153f.enc}</usr/share/texmf/
-fonts/type1/bluesky/cm/cmsy10.pfb>{/usr/share/texmf/dvips/tetex/09fbbfac.enc}</
-usr/share/texmf/fonts/type1/bluesky/cm/cmtt8.pfb></usr/share/texmf/fonts/type1/
-bluesky/cm/cmtt10.pfb>{/usr/share/texmf/dvips/tetex/74afc74c.enc}</usr/share/te
-xmf/fonts/type1/bluesky/cm/cmti10.pfb>{/usr/share/texmf/dvips/tetex/f7b6d320.en
-c}</usr/share/texmf/fonts/type1/bluesky/cm/cmr7.pfb></usr/share/texmf/fonts/typ
-e1/bluesky/cm/cmr10.pfb></usr/share/texmf/fonts/type1/bluesky/cm/cmbx10.pfb></u
-sr/share/texmf/fonts/type1/bluesky/cm/cmbx12.pfb></usr/share/texmf/fonts/type1/
-bluesky/cm/cmsy9.pfb></usr/share/texmf/fonts/type1/bluesky/cm/cmr9.pfb></usr/sh
-are/texmf/fonts/type1/bluesky/cm/cmr6.pfb></usr/share/texmf/fonts/type1/bluesky
-/cm/cmr8.pfb></usr/share/texmf/fonts/type1/bluesky/cm/cmr12.pfb></usr/share/tex
-mf/fonts/type1/bluesky/cm/cmr17.pfb>{/usr/share/texmf/dvips/tetex/0ef0afca.enc}
-</usr/share/texmf/fonts/type1/bluesky/cm/cmcsc10.pfb>
-Output written on judgeit.pdf (11 pages, 179062 bytes).
+ 34i,11n,36p,1047b,407s stack positions out of 1500i,500n,5000p,200000b,5000s
+ 233 PDF objects out of 300000
+ 69 named destinations out of 131072
+ 93 words of extra memory for PDF output out of 65536
+</usr/share/texmf/fonts/type1/bluesky/cm/cmex10.pfb>{/usr/share/texmf/dvips/t
+etex/bbad153f.enc}</usr/share/texmf/fonts/type1/bluesky/cm/cmsy7.pfb>{/usr/shar
+e/texmf/dvips/tetex/aae443f0.enc}</usr/share/texmf/fonts/type1/bluesky/cm/cmmi7
+.pfb></usr/share/texmf/fonts/type1/bluesky/cm/cmmi10.pfb></usr/share/texmf/font
+s/type1/bluesky/cm/cmsy10.pfb>{/usr/share/texmf/dvips/tetex/09fbbfac.enc}</usr/
+share/texmf/fonts/type1/bluesky/cm/cmtt8.pfb></usr/share/texmf/fonts/type1/blue
+sky/cm/cmtt10.pfb>{/usr/share/texmf/dvips/tetex/74afc74c.enc}</usr/share/texmf/
+fonts/type1/bluesky/cm/cmti10.pfb>{/usr/share/texmf/dvips/tetex/f7b6d320.enc}</
+usr/share/texmf/fonts/type1/bluesky/cm/cmr7.pfb></usr/share/texmf/fonts/type1/b
+luesky/cm/cmr10.pfb></usr/share/texmf/fonts/type1/bluesky/cm/cmbx10.pfb></usr/s
+hare/texmf/fonts/type1/bluesky/cm/cmbx12.pfb></usr/share/texmf/fonts/type1/blue
+sky/cm/cmsy9.pfb></usr/share/texmf/fonts/type1/bluesky/cm/cmr9.pfb></usr/share/
+texmf/fonts/type1/bluesky/cm/cmr6.pfb></usr/share/texmf/fonts/type1/bluesky/cm/
+cmr8.pfb></usr/share/texmf/fonts/type1/bluesky/cm/cmr12.pfb></usr/share/texmf/f
+onts/type1/bluesky/cm/cmr17.pfb>{/usr/share/texmf/dvips/tetex/0ef0afca.enc}</us
+r/share/texmf/fonts/type1/bluesky/cm/cmcsc10.pfb>
+Output written on judgeit.pdf (13 pages, 193730 bytes).

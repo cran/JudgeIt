@@ -1,4 +1,37 @@
-export(judgeit,v2s,vshar)
-S3method(summary, judgeit)   
-S3method(print, judgeit)   
+export(judgeit,
+	JudgeIt,
+	v2s,
+	vshar,
+
+	seats,
+	voting.power,
+	prob,seats.with.prob,
+	results.prob,winprob,
+	distreport,district.report,
+	conditional.seats,
+	votes.for.result,winvote,
+	bias.resp,svsum
+	)
+
+S3method(summary,judgeit)   
+S3method(print,judgeit)   
 S3method(plot,judgeit)
+
+S3method(plot,judgeit.seats)
+S3method(plot,judgeit.voting.power)
+S3method(plot,judgeit.prob)
+S3method(plot,judgeit.winprob)
+S3method(plot,judgeit.district.report)
+S3method(plot,judgeit.conditional.seats)
+S3method(plot,judgeit.winvote)
+S3method(plot,judgeit.svsum)
+
+S3method(print,judgeit.seats)
+S3method(print,judgeit.voting.power)
+S3method(print,judgeit.prob)
+S3method(print,judgeit.winprob)
+S3method(print,judgeit.district.report)
+S3method(print,judgeit.conditional.seats)
+S3method(print,judgeit.winvote)
+S3method(print,judgeit.svsum)
+

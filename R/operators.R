@@ -11,12 +11,13 @@ function (covars,voteshare=NULL,w=NULL) {
   #crops rows with missing values from covars/voteshare/weights 
   z <- cbind(covars,voteshare,w)
   set.inc <- NULL
-  set.out <- NULL 
+  set.out <- NULL
+  
   for (ii in 1:(dim(z)[1])) if (!(any(is.na(z[ii,])))) set.inc <- c(set.inc,ii) else set.out <- c(set.out,ii)
   out <- NULL
-  out$covars <- as.matrix(covars[set.inc,])
-  if (!is.null(voteshare)) out$voteshare <- matrix(voteshare[set.inc])
-  if (!is.null(w)) out$w <- matrix(w[set.inc])
+  out$covars <- cbind(covars[set.inc,])
+  if (!is.null(voteshare)) out$voteshare <- cbind(voteshare[set.inc])
+  if (!is.null(w)) out$w <- cbind(w[set.inc])
 
   out$set.out <- set.out
   out$set.inc <- set.inc
@@ -61,15 +62,34 @@ function (judgeit.object,same.districts,uncontesteds.method) {
 }
 
 `inrange` <-
-function(r1,l,h) 1*((r1>l)&(r1<h))
+function(r1,l,h) return(1*((r1>l)&(r1<h)))
 
 `missed` <-
-function (mat) {one <- function(row) !any(is.na(row)); which(apply(mat,1,one)>0)}
+function (mat) {one <- function(row) !any(is.na(row)); return(which(apply(mat,1,one)>0))}
+
+
+`model.preds` <-
+function(frame) {
+  checker <- attr(attr(frame,"terms"),"factors")
+  preds <- NULL
+  if (!is.null(dim(checker)[2])) for (ii in 1:dim(checker)[2]) {
+    thinglonger <- as.matrix(frame[,which(checker[,ii]>0)])
+    preds <- cbind(preds,apply(thinglonger,1,prod))
+  }
+  
+  if (attr(attr(frame,"terms"),"intercept")) {
+    preds <- cbind(rep(1,dim(frame)[1]),preds)
+    colnames(preds) <- c("(Intercept)",attr(attr(frame,"terms"),"term.labels"))
+  } else colnames(preds) <- attr(attr(frame,"terms"),"term.labels")
+  rownames(preds) <- rownames(frame)
+  return(preds)
+}
+
 
 `nacheck` <-
 function (stuff) {
   work <- function(stiff) all(is.na(stiff))
-  any(apply(stuff,2,work))
+  return(any(apply(stuff,2,work)))
 }
 
 `new.list` <-
@@ -77,26 +97,73 @@ function(len) {
   out <- list(NA)
   if (len<1) stop ("Can't make a list of length ",len,".")
   for (ii in 1:len) out[[ii]] <- NA
-  out
+  return(out)
+}
+
+`mvrnorm.cribbed` <- function (n = 1, mu, Sigma, tol = 1e-06, empirical = FALSE)
+{ #cribbed from MASS.
+  p <- length(mu)
+  if (!all(dim(Sigma) == c(p, p))) 
+    stop("incompatible arguments")
+  eS <- eigen(Sigma, sym = TRUE, EISPACK = TRUE)
+  ev <- eS$values
+  if (!all(ev >= -tol * abs(ev[1]))) 
+    stop("'Sigma' is not positive definite")
+  X <- matrix(rnorm(p * n), n)
+  if (empirical) {
+    X <- scale(X, TRUE, FALSE)
+    X <- X %*% svd(X, nu = 0)$v
+    X <- scale(X, FALSE, TRUE)
+  }
+  X <- drop(mu) + eS$vectors %*% diag(sqrt(pmax(ev, 0)), p) %*% t(X)
+  nm <- names(mu)
+  if (is.null(nm) && !is.null(dn <- dimnames(Sigma))) 
+    nm <- dn[[1]]
+  dimnames(X) <- list(nm, NULL)
+  if (n == 1) 
+    drop(X)
+  else t(X)
 }
 
 `rb` <-
-function (dr,bits) if (!is.null(bits)) rbind (dr,as.matrix(replicate(dim(dr)[2],bits))) else dr
+function (dr,bits) {
+  if (length(bits)>0) out <- rbind(dr,array(bits,c(length(bits),dim(dr)[2]))) else out <- dr
+  return(out)
+}
 
+`reg` <-
+function (covars,voteshare,wt=rep(1,length(voteshare))) {
+  #while we're aware that this is duplicate work, it remains to keep things simple. -AT, 8-1-08
+  wtmatinv <- diag(as.numeric(wt)^(-1))
+  mom <- t(covars)%*%wtmatinv%*%covars
+  beta <- solve(mom)%*%t(covars)%*%wtmatinv%*%voteshare
+    
+  vshat <- covars%*%beta
+  e <- voteshare-vshat
+  sig2 <- as.numeric(t(e)%*%wtmatinv%*%e/(dim(covars)[1]-dim(covars)[2]))
+  vc <- solve(mom)*sig2
+
+  out <- NULL
+  out$beta <- as.matrix(beta)  #beta vector.
+  out$vc <- as.matrix(vc)  #variance-covariance matrix.
+  out$sig2 <- sig2  #homoskedastic variance parameter.
+  out$vshat <- vshat
+  return(out)
+}
+          
 `repunc` <-
 function (voteshare,l,u,lr,ur) {
   f1 <- function (a,b,c,d,e) if (!is.na(a)) {
     if (a<b) a <- d else if (a>c) a <- e else a
   } else NA
-  sapply (voteshare,f1,l,u,lr,ur)
+  return(sapply (voteshare,f1,l,u,lr,ur))
 }
 
 `rowm` <-
 function (matrx,index) {
-#  writeLines ("e1 rowm")
   out <- matrix(matrx[index,],length(index))
   rownames(out) <- index
-  out
+  return(out)
 }
 
 `tiep` <-
@@ -172,3 +239,4 @@ function(inp) 1*(inp>0.5)
 `vshar` <-
 function(r1,r2) r1/(r1+r2)
 
+`share` <- function(...) vshar(...)

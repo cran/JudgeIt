@@ -14,6 +14,7 @@ j.ob <- judgeit(model.form=VOTE~unc(VOTE)+INC,vote.form=TURNOUT~1,
                     use.last.votes=T,subset=DELSOUTH==0)
 
 #run some seats routines.
-j.ob.1 <- judgeit(judgeit.object=j.ob,routine="seats",mean.votes=seq(0.3,0.7,by=0.01),year=which(elecyears==1904))
-plot(j.ob.1)
-#plot(j.ob.1,filename="1904house")
+seating <- seats(j.ob,mean.votes=seq(0.3,0.7,by=0.01),
+                 year=1904)
+plot(seating)
+

@@ -1,5 +1,5 @@
 `dists` <-
-function (judgeit.object,year) {  #this method works for all of the above
+function (judgeit.object) {  #this method works for all of the above
   mu <- judgeit.object$mu
   std <- judgeit.object$std
   pwin <- judgeit.object$pwin
@@ -7,8 +7,7 @@ function (judgeit.object,year) {  #this method works for all of the above
   lnvprb <- tiep(mu,std,judgeit.object$turnoutvec) #should be turnout.
   out <- cbind(mu,std,pwin)
 
-  if (judgeit.object$svexpected.value.only) item <- "P(E(vote)>0.5)" else
-    item <- "P(vote>0.5)"
+  item <- "P(vote>0.5)"
   if (!judgeit.object$predict) {
     out <- cbind(judgeit.object$votevec,out)
     item2 <- c("Observed Vote","Expected Vote")
@@ -18,418 +17,336 @@ function (judgeit.object,year) {  #this method works for all of the above
   out <- cbind (out,exp(lnvprb),lnvprb)
   colnames (out) <- c(cn,"P(decisive)","ln(P(decisive))")
 
-  return(out)
-}
-
-`eseats` <-
-function (judgeit.object,year,Ev) {
-  mu <- judgeit.object$mu
-  std <- judgeit.object$std
-  pwin <- judgeit.object$pwin
-  out <- NULL
-  out$delta <- Ev-judgeit.object$meanvote
-  rcmat <- crossadd (mu,out$delta)
-  findp <- function (colt) {
-    xx <- c(1-pnorm(0.5,colt,std),v2s(judgeit.object$extra.districts[,1]))
-    ww <- c(judgeit.object$seatvec,judgeit.object$extra.districts[,3])
-    weighted.mean(xx,ww)
-  }
-  out$Es <- apply (rcmat,2,findp)
-  return(out)
+  out.object <- list(output=out,
+                     year=judgeit.object$year,
+                     cal.year=judgeit.object$years[judgeit.object$year])
+  class(out.object) <- "judgeit.district.report"
+  
+  return(out.object)
 }
 
 `freq` <-
-function (judgeit.object,year,vprop) { #,condition=NULL) { 
+function (judgeit.object) { #,condition=NULL) { 
 #  if (is.null(condition)) condition <- 1:length(judgeit.object$mu)
-  sim <- hyp.elects(judgeit.object,year,truncit=T)
-  sim <- rb(sim,judgeit.object$extra.districts[,1])
-  seats <- c(judgeit.object$seatvec,judgeit.object$extra.districts[,3])
+  h.elec <- hyp.elects(judgeit.object,results=TRUE)
+  vprop <- judgeit.object$vote.range
   
+  sim <- h.elec$votes
+  seats <- h.elec$seats
+    
   sim2 <- apply(inrange(sim,vprop[1],vprop[2]),2,weighted.mean,seats)
-  out <- array(c(mean(sim2),quantile(sim2,c(0.025,0.975))),c(1,3))
-  colnames(out) <- c("Mean Seat Share","2.5%","97.5%")
+  out <- rbind(c(mean(sim2),quantile(sim2,c(0.025,0.5,0.975))))
+  colnames(out) <- c("Mean Seat Share","2.5%","50%","97.5%")
   rownames(out) <- paste(signif(vprop[1],3),"-",signif(vprop[2],3),sep="")
-  out
+  out.object <- list(output=out,
+                     year=judgeit.object$year,
+                     vote.range=vprop,
+                     cal.year=judgeit.object$years[judgeit.object$year])
+  class(out.object) <- "judgeit.conditional.seats"
+  
+  return(out.object)
 }
 
-`hyp.elects` <-
-function(judgeit.object,year=404,delvbar=c(NA,NA),truncit=T,just.mean.sd=F) {
 
-  mvrnorm <- function (n = 1, mu, Sigma, tol = 1e-06, empirical = FALSE)
-  { #cribbed from MASS.
-    p <- length(mu)
-    if (!all(dim(Sigma) == c(p, p))) 
-        stop("incompatible arguments")
-    eS <- eigen(Sigma, sym = TRUE, EISPACK = TRUE)
-    ev <- eS$values
-    if (!all(ev >= -tol * abs(ev[1]))) 
-        stop("'Sigma' is not positive definite")
-    X <- matrix(rnorm(p * n), n)
-    if (empirical) {
-        X <- scale(X, TRUE, FALSE)
-        X <- X %*% svd(X, nu = 0)$v
-        X <- scale(X, FALSE, TRUE)
-    }
-    X <- drop(mu) + eS$vectors %*% diag(sqrt(pmax(ev, 0)), p) %*% 
-        t(X)
-    nm <- names(mu)
-    if (is.null(nm) && !is.null(dn <- dimnames(Sigma))) 
-        nm <- dn[[1]]
-    dimnames(X) <- list(nm, NULL)
-    if (n == 1) 
-        drop(X)
-    else t(X)
+`hyp.elects` <- function(judgeit.object,zero.mean=FALSE,results=FALSE) {
+  #results is obsolete.
+  
+  if (is.null(judgeit.object$extra.districts)) judgeit.object$extra.districts <- array(0,c(0,4))
+  
+  j.o <- judgeit.object
+  year <- j.o$year
+
+  bets <- t(mvrnorm.cribbed(j.o$sims,j.o$beta[[year]],j.o$vc[[year]]))
+  means <- j.o$mult%*%bets+as.vector(j.o$baseline) + #beta generation.
+    array(rnorm(j.o$sims*dim(j.o$mult)[1],0,j.o$gamma.std),c(dim(j.o$mult)[1],j.o$sims)) #gamma.
+ 
+  vsim <- rb(means,j.o$extra.districts[,1])
+  sds <- c(j.o$stoned,j.o$extra.districts[,2])
+  seats <- c(j.o$seatvec,j.o$extra.districts[,3])
+  weight.d <- c(j.o$weightvec,j.o$extra.districts[,4])
+  mean.diff <- apply(vsim,2,weighted.mean,weight.d)
+  if (zero.mean) vsim <- vsim - t(array(mean.diff,dim(t(vsim))))
+  
+  scatter <- array(rnorm(length(vsim),0,sds),dim(vsim))
+
+  votes <- scatter+vsim
+  if (zero.mean) {
+    md <- apply(votes,2,weighted.mean,weight.d)
+    votes <- votes-t(array(md,dim(t(votes))))
   }
   
-  #baseline, mult, stoned
-  bets <-
-    t(mvrnorm(judgeit.object$sims,judgeit.object$beta[[year]],judgeit.object$vc[[year]]))
+  out.object <- list(means=vsim,sds=sds,seats=seats,weights=weight.d,
+              mean.diff=mean.diff,votes=votes,scatter=scatter)
 
-  if (!just.mean.sd) {
-    rs <- length(judgeit.object$mu)
-    elects <-
-      array(rnorm(judgeit.object$sims*rs,judgeit.object$baseline,judgeit.object$stoned),c(rs,judgeit.object$sims))
-
-    elects <- elects+judgeit.object$mult%*%bets
-  
-    delta <- 0
-    if (is.na(delvbar[2])&!is.na(delvbar[1])) delta <- delvbar[1] else
-    if (!is.na(delvbar[2])&is.na(delvbar[1])) delta <- delvbar[2]-judgeit.object$meanvote
-    elects <- elects+delta
-    if (truncit) elects <- trunc01(elects)
-  } else {
-    delta <- 0
-    if (is.na(delvbar[2])&!is.na(delvbar[1])) delta <- delvbar[1] else
-    if (!is.na(delvbar[2])&is.na(delvbar[1])) delta <- delvbar[2]-judgeit.object$meanvote
-
-    elects <- NULL
-    elects$means <- judgeit.object$mult%*%bets+as.vector(judgeit.object$baseline)+delta
-    elects$sds <- judgeit.object$stoned
-  }
-
-  return(elects)
+  return(out.object)
 }
 
-`model.preds` <-
-function(frame) {
-  checker <- attr(attr(frame,"terms"),"factors")
-  preds <- NULL
-  if (!is.null(dim(checker)[2])) for (ii in 1:dim(checker)[2]) {
-    thinglonger <- as.matrix(frame[,which(checker[,ii]>0)])
-    preds <- cbind(preds,apply(thinglonger,1,prod))
-  }
-  
-  if (attr(attr(frame,"terms"),"intercept")) {
-    preds <- cbind(rep(1,dim(frame)[1]),preds)
-    colnames(preds) <- c("(Intercept)",attr(attr(frame,"terms"),"term.labels"))
-  } else colnames(preds) <- attr(attr(frame,"terms"),"term.labels")
-  rownames(preds) <- rownames(frame)
-  return(preds)
-}
 
 `pv` <-
-function (judgeit.object,year,Ev=NULL,delta=NULL,lohi=NULL) {
+function (judgeit.object) {
+  #fraction of districts(seats) with a probability of winning in the specified probability range.
+  delta <- judgeit.object$shift.in.votes
+  mean.votes <- judgeit.object$mean.votes
+  prob.range <- judgeit.object$prob.range
   
-  if (is.null(Ev)&is.null(delta)) stop ("Error in probability-vs-votes: no proportions or shifts specified.")
-  if (is.null(lohi)|all(lohi==c(0.5,1))) lohi <- c(0.5,1e6)
-  delvbar <- c(NA,NA) #no adjustments here.
-  if (is.null(delta)) delta <- Ev-judgeit.object$meanvote
+  h.elec <- hyp.elects(judgeit.object)   #seats, weights, mean.diff, votes
+  means <- h.elec$means
+  sds <- h.elec$sds
+  mean.diff <- h.elec$mean.diff
+  outtype <- NULL
   
-  vsim <- hyp.elects(judgeit.object,year,delvbar,truncit=F) #generate elections.
-  probs <- sapply (delta,FUN=function(ii) apply(inrange(vsim+ii,lohi[1],lohi[2]),2,mean))
-
-  out <- t(rbind (apply(probs,2,mean),apply(probs,2,quantile,c(0.025,0.975))))
+  if (!is.null(delta)) {
+    pv.del <- t(sapply(delta,FUN=function(ii) {
+      means.t <- means+ii
+      ir.probs <- inrange(1-pnorm(0.5,means.t,sds),prob.range[1],prob.range[2])
+      res <- apply(ir.probs,2,weighted.mean,h.elec$seats)
+      return(c(mean(res),quantile(res,c(0.025,0.975))))
+    }))
+    colnames(pv.del) <- c("Mean","2.5%","97.5%")
+    rownames(pv.del) <- delta
+    outtype <- "delta"
+  } else {
+    means <- means-t(array(mean.diff,dim(t(means)))) #corrected to zero mean.
+    pv.del <- t(sapply(mean.votes,FUN=function(ii) {
+      means.t <- means+ii
+      ir.probs <- inrange(1-pnorm(0.5,means.t,sds),prob.range[1],prob.range[2])
+      res <- apply(ir.probs,2,weighted.mean,h.elec$seats)
+      return(c(mean(res),quantile(res,c(0.025,0.975))))
+    }))
+    colnames(pv.del) <- c("Mean","2.5%","97.5%")
+    rownames(pv.del) <- mean.votes
+    outtype <- "mean.votes"
+  }
   
-  colnames(out) <- c("Mean","2.5%","97.5%")
-  if (!is.null(Ev)) rownames(out) <- Ev else rownames(out) <- delta
-  out
+  out.object <- list(output=pv.del,outtype=outtype,
+                     meanvote=judgeit.object$meanvote,
+                     cal.year=judgeit.object$years[judgeit.object$year],
+                     prob.range=prob.range,
+                     mean.votes=mean.votes,
+                     year=judgeit.object$year)
+  
+  class(out.object) <- "judgeit.prob"
+  return(out.object)
 }
 
-`reg` <-
-function (covars,voteshare,wt=rep(1,length(voteshare))) {
-  wtmatinv <- diag(as.numeric(wt)^(-1))
-  mom <- t(covars)%*%wtmatinv%*%covars
-  beta <- solve(mom)%*%t(covars)%*%wtmatinv%*%voteshare
-    
-  vshat <- covars%*%beta
-  e <- voteshare-vshat
-  sig2 <- as.numeric(t(e)%*%wtmatinv%*%e/(dim(covars)[1]-dim(covars)[2]))
-  vc <- solve(mom)*sig2
+`winprob.raw` <-
+function (judgeit.object) {
+  #q of i: probability that party 1 gets seat share in the seat range.
 
-  out <- NULL
-  out$beta <- as.matrix(beta)  #beta vector.
-  out$vc <- as.matrix(vc)  #variance-covariance matrix.
-  out$sig2 <- sig2  #homoskedastic variance parameter.
-  out$vshat <- vshat
-  return(out)
+  delta <- judgeit.object$shift.in.votes
+  mean.votes <- judgeit.object$mean.votes
+  seat.range <- judgeit.object$seat.range
+
+  h.elec <- hyp.elects(judgeit.object)
+
+  means <- h.elec$means
+  sds <- h.elec$sds
+  scatter <- h.elec$scatter
+  mean.diff <- h.elec$mean.diff
+  outtype <- NULL
+
+  outcome.one <- function(mean.vec) {
+    spread <- apply(scatter+mean.vec,2,weighted.mean,h.elec$seats)
+    return(mean(inrange(spread,seat.range[1],seat.range[2])))
+  }
+  
+  if (!is.null(delta)) {
+    pv.del <- t(sapply(delta,FUN=function(ii) {
+      means.t <- means+ii
+      ir.probs <- apply(means.t,2,outcome.one)
+      return(c(mean(ir.probs),quantile(ir.probs,c(0.025,0.975))))
+    }))
+    colnames(pv.del) <- c("Mean","2.5%","97.5%")
+    rownames(pv.del) <- delta
+    outtype <- "delta"
+  } else {
+    means <- means-t(array(mean.diff,dim(t(means)))) #corrected to zero mean.
+    pv.del <- t(sapply(mean.votes,FUN=function(ii) {
+      means.t <- means+ii
+      ir.probs <- apply(means.t,2,outcome.one)
+      return(c(mean(ir.probs),quantile(ir.probs,c(0.025,0.975))))
+    }))
+    colnames(pv.del) <- c("Mean","2.5%","97.5%")
+    rownames(pv.del) <- mean.votes
+    outtype <- "mean.votes"
+  }
+
+  out.object <- list(output=pv.del,outtype="outtype",
+                     meanvote=judgeit.object$meanvote,
+                     seat.range=seat.range,
+                     cal.year=judgeit.object$years[judgeit.object$year],
+                     year=judgeit.object$year)
+  class(out.object) <- "judgeit.winprob"
+
+  return(out.object)
 }
+
 
 `sv` <-
-function (judgeit.object,year,Ev) {
-  if (is.null(Ev)) stop ("No mean vote shares specified.")
-  eres <- eseats (judgeit.object,year,Ev)
-  vsim0 <- hyp.elects(judgeit.object,year,truncit=FALSE,just.mean.sd=TRUE)
-  vsim <- vsim0$means
-  sds <- vsim0$sds
+function (judgeit.object) {
+  
+  mean.votes <- judgeit.object$mean.votes
+  if (is.null(mean.votes)) stop ("No mean vote shares specified.")
 
-  outty <- sapply(1:length(Ev),FUN=function(ii) {
-    vmn <- vsim+eres$delta[ii]
-    tt <- 1-pnorm(0.5,vmn,sds)
-    if (length(judgeit.object$extra.districts)>0) 
-      tt <- rbind(tt,array(1*(judgeit.object$extra.districts[,1]>0.5),
-                       c(dim(judgeit.object$extra.districts[,1])[1],dim(tt)[2])))
-    
-    res <-
-      apply(tt,2,weighted.mean,c(judgeit.object$weightvec,judgeit.object$extra.districts[,4]))
+  quants <- hyp.elects(judgeit.object,zero.mean=TRUE)
+  big.res <- quants$votes
+  sds <- quants$sds
+  seats <- quants$seats
+  weights <- quants$weights
+  
+  outty <- sapply(1:length(mean.votes),FUN=function(ii) {
+    vmn <- big.res+mean.votes[ii]
+    tt <- 1*(vmn>0.5)     
+    res <- apply(tt,2,weighted.mean,weights)
     return(c(mean(res),quantile(res,c(0.025,0.975))))
   })
   
   out <- as.data.frame(t(outty))
-  rownames(out) <- Ev; colnames(out) <- c("Seats Mean","2.5%","97.5%")
-                  return(out)
+  rownames(out) <- mean.votes
+  colnames(out) <- c("Seats Mean","2.5%","97.5%")
+  out.object <- list(output=out,
+                     mean.votes=mean.votes,
+                     obsvotes=judgeit.object$obsvotes,
+                     obsseats=judgeit.object$obsseats,
+                     cal.year=judgeit.object$years[judgeit.object$year])
+  class(out.object) <- "judgeit.seats"
+  return(out.object)
 }
 
-`svsum` <-
-function (judgeit.object,year) {
-  judgeit.object$svexpected.value.only <- F; #samebg<-T
-  seats <- c(judgeit.object$seatvec,judgeit.object$extra.districts[,3])
-  weights <- c(judgeit.object$weightvec,judgeit.object$extra.districts[,4])
-  delvbar <- c(NA,0.5)
+`svsum.raw` <-
+function (judgeit.object) {
   #quantities desired in each district: bias and responsiveness for range, center
-
   intvl <- 45:55/100
-  out <- rbind(rep(0,4))
-  rsim <- hyp.elects(judgeit.object,year,delvbar,just.mean.sd=T)
+
+  rsim <- hyp.elects(judgeit.object,zero.mean=TRUE)
   vsim <- rsim$means
-#  print(dim(vsim))
   sds <- rsim$sds
-#  print(length(sds))
-  o1 <- o2 <- o3 <- o4 <- o5 <- NA
-
-  #New approach: rather than simulate elections, just simulate posterior.
+  seats <- rsim$seats
+  weights <- rsim$weights
   
-  qofi <- sapply(1:dim(vsim)[2],FUN=function(ii) {  #each simulation. 
-
-    #if (ii %% 50 == 0) print(ii)
-    tt <- crossadd(vsim[,ii],intvl-0.5)
-    tt <- 1-pnorm(0.5,tt,sds)
-    tt <-
-      rbind(tt,array(1*(judgeit.object$extra.districts[,1]>0.5),c(length(judgeit.object$extra.districts[,1]),11) ) )
-        
+  svquants <- function (h.mn,h.sd,h.st,h.wt,intvl,meanvote) {
+    intvl <- c(intvl,meanvote+c(-0.01,0.01))
+    tt <- crossadd(h.mn,intvl)
+    tt <- 1-pnorm(0.5,tt,h.sd)
     sts <- apply(tt,2,weighted.mean,seats)  
+
     #midpoint bias
     o1 <- 2*sts[6]-1
-          
     #spread bias
     o2 <- mean(sts[11:7]+sts[1:5]-1)
-          
     #responsiveness
     o3 <- (sts[11]-sts[1])/(intvl[11]-intvl[1])
-
-    mv <- weighted.mean(judgeit.object$mu,judgeit.object$weightvec)
-    intvl2 <- mv+c(-0.01,0.01)    
+    o4 <- (sts[13]-sts[12])/(intvl[13]-intvl[12])
     
-    tt <- crossadd(vsim[,ii],intvl2-0.5)
-    tt <- 1-pnorm(0.5,tt,sds)
-    tt <- rbind(tt,array(1*(judgeit.object$extra.districts[,1]>0.5),
-                         c(length(judgeit.object$extra.districts[,1]),2) ) )
-        
-    sts <- apply(tt,2,weighted.mean,seats)
-
-    o4 <- (sts[2]-sts[1])/(intvl2[2]-intvl2[1])
-    
-    return(c(o1,o2,o3,o4))
-
-  })
-
-  vs <- apply(qofi,1,var)
-  out <- cbind(apply(qofi,1,mean)[1:4],sqrt(vs))
+    return(c(o1,o2,o3,o4,sts[1:11]))
+  }
   
-  colnames(out) <- c("Mean","SD")
+  qofi <- apply(vsim,2,svquants,sds,seats,weights,
+                intvl,judgeit.object$meanvote)
+  
+  out <- cbind(apply(qofi,1,mean),
+               apply(qofi,1,sd),
+               t(apply(qofi,1,quantile,c(0.025,0.5,0.975))))
+  
+  colnames(out) <- c("Mean","SD","2.5%","50%","97.5%")
   rownames(out) <- c("Partisan Bias (0.5)","Partisan Bias (0.45-0.55)",
-                    "Responsiveness (0.45-0.55)","Responsiveness (observed)")
-  return(signif(out,4))
+                    "Responsiveness (0.45-0.55)",
+                     "Responsiveness (observed)",intvl)
+  
+  out.object <- list(svsums=out[1:4,],svplot=out[5:15,],
+                     obsvotes=judgeit.object$obsvotes,
+                     obsseats=judgeit.object$obsseats,
+                     cal.year=judgeit.object$years[judgeit.object$year])
+  class(out.object) <- "judgeit.svsum"
+  
+  return(out.object)
 }
 
-`voting.power` <-
-function (judgeit.object,year,vot,tot) {
+`voting.power.raw` <-
+function (judgeit.object) {
   #Voting power routine. Only compares groups - don't care about power in each district yet.
-  if (is.null(vot)) stop ("No voting groups have been specified.")
-  if (is.null(tot)) {
-    writeLines ("No total population groups specified; continuing without.")
-    tot <- vot
-  }
-  if (any(dim(vot)!=dim(tot))) stop ("Dimensions of voting group and total groups don't match.")
 
-  single.result <- function (means,sds,voters) {
-    group.pops <- apply(voters,1,sum)
-    log.voting.power <- tiep(means,sds,group.pops)
-    return(sapply(1:dim(voters)[2],FUN=function(ii)
-                  weighted.mean(exp(log.voting.power),voters[,ii])))
-  }
-  vs0 <- hyp.elects(judgeit.object,year,c(NA,NA),truncit=FALSE,just.mean.sd = TRUE)
+  year <- judgeit.object$year
+  vot <- judgeit.object$pop.mat
+  group.pops <- judgeit.object$eligible.vec
+    
+  #get rid of all missing columns.
+  missing.columns <- which(sapply(1:dim(vot)[2],FUN=function(cc) all(is.na(vot[,cc]))))
+  if (length(missing.columns)>0) vot <- vot[,-missing.columns]
   
-  turnout <- apply(vot,1,sum)
-  eligible.voters <- apply(tot,1,sum)
-  if (any(tot-vot<0)) stop ("The number of eligible voters in one group is smaller than the observed number.")
+  vs0 <- hyp.elects(judgeit.object)
 
-  raw.total <- apply(vs0$means,2,single.result,vs0$sds,vot)
+  ok.rows <- missed(vot)
+  vot <- cbind(vot[ok.rows,])
+  means.all <- vs0$means[ok.rows,]
+  sds <- vs0$sds[ok.rows]
+  group.pops <- group.pops[ok.rows]
+  
+  single.result <- function (means) {
+    log.voting.power <- tiep(means,sds,group.pops)
+    return(sapply(1:dim(vot)[2],FUN=function(ii)
+                  weighted.mean(exp(log.voting.power),vot[,ii])))
+  }
+ 
+  raw.total <- rbind(apply(means.all,2,single.result))
   output1 <- rbind(apply(raw.total,1,mean),apply(raw.total,1,quantile,c(0.025,0.975)))
 
-  if (tot!=vot) {
-    raw.total <- apply(vs0$means,2,single.result,vs0$sds,tot-vot)
-    output1 <- rbind(output1,apply(raw.total,1,mean),apply(raw.total,1,quantile,c(0.025,0.975)))
-    raw.total <- apply(vs0$means,2,single.result,vs0$sds,tot)
-    output1 <- rbind(output1,apply(raw.total,1,mean),apply(raw.total,1,quantile,c(0.025,0.975)))
-    colnames(output1) <- c("Mean voter Power","2.5%","97.5%","Non-Voter Power","2.5%","97.5%","Member power","2.5%","97.5%")
-  } else colnames(output1) <- c("Mean voter Power","2.5%","97.5%")
-  
-  return(output1)
+  rownames(output1) <- c("Mean voter Power","2.5%","97.5%")
+  colnames(output1) <- colnames(vot)
+
+  out.object <- list(output=output1,
+                     cal.year=judgeit.object$years[judgeit.object$year])
+  class(out.object) <- "judgeit.voting.power"
+  return(out.object)
 }
 
-`winprob` <-
-function (judgeit.object,year,lohi,Ev=NULL,delta=NULL) {
-  #what's the story here? Wish I knew. 3-16-08
-  if (is.null(lohi)) lohi <- c(0,1)
-  if (lohi[1]<=0) lohi[1] <- -1e6; if (lohi[2]>=1) lohi[2] <- 1e6
-  vsim <- hyp.elects(judgeit.object,year,c(NA,NA),FALSE)
-  if (is.null(Ev)) delta.v <- delta else 
-    if (is.null(delta)) delta.v <- Ev-judgeit.object$meanvote else
-      stop("Trouble in winprob: Neither mean vote or delta specified.")
-  out <- sapply(delta.v,FUN=function(ii) {
-    quant <- inrange(apply(trunc01(rb(vsim+ii,judgeit.object$extra.districts[,1])),
-         2,weighted.mean,c(judgeit.object$seatvec,judgeit.object$extra.districts[,3])),
-                        lohi[1],lohi[2])
-    c(mean(quant),sd(quant)/sqrt(judgeit.object$sims))
-  })
-  out <- t(out)
-  colnames(out) <- c("Mean","SD of Mean")
-  return(out)
-}
+`winvote.raw` <-
+function (judgeit.object) {
+  p.win <- judgeit.object$prob.win
+  vs0 <- hyp.elects(judgeit.object)
 
-`winvote` <-
-function (judgeit.object,year,pr) {
-  work <- function(in.mean,in.sd,weights) {
-    lo <- 0; hi <- 1; probwin <- 9999; res <- 0.5; ii <- 0; bogus <- F
-    patho <- NULL
-    if ((pr>=0)&(pr<=1)) while (abs(probwin-pr)>0.0001) {
-      res <- mean(c(lo,hi))
-      vsim <- in.mean-0.5+res
-      big.mean <- weighted.mean(vsim,weights)
-      big.sd <- sqrt(weighted.mean(in.sd^2,weights))
-      probwin <- 1-pnorm(0.5,big.mean,big.sd)
-      if (pr>probwin) lo <- mean(c(lo,res)) else hi <- mean(c(hi,res))
-#      writeLines (paste(signif(probwin,4),signif(lo,4),signif(hi,4),signif(big.mean),signif(big.sd)))
-      patho <- rbind(patho,c(pr,probwin,lo,hi))
-      ii <- ii+1
-      if (ii == 100) {
-        writeLines ("winvote: Too many repetitions...")
-        probwin <- pr
-        bogus <- T
-      }
-      if (ii>10) if (all(patho[ii,2]==patho[(ii-9):(ii-1),2])) {
-        writeLines(paste(ii,"Trouble in winvote:",signif(probwin,4),"stuck for",pr,":",patho[1:3,2]))
-        res <- -probwin
-        probwin <- pr
-      }
-    } else stop ("In winvote, p(win) isn't between 0 and 1.")
-    if (!bogus) return(res) else {
-      writeLines(paste("Winvote attempt",ii,"failed to converge."))
-      return(NA)
+  e.sd <- vs0$sds
+  weights <- vs0$weights
+  seats <- vs0$seats
+  scatter <- vs0$scatter
+
+  winvote.one.improved <- function(e.means) {
+
+    single.result.winning.vote <- function(res) {
+                                        #row 1: outcomes
+                                        #row 2: seats
+      
+      res.obj <- rbind(res,seats)
+      res.obj <- res.obj[,order(res.obj[1,])]
+      cs.seats <- cumsum(res.obj[2,])
+      item.of.interest <- min(which(cs.seats>cs.seats[length(cs.seats)]/2))
+      retty <- res.obj[1,item.of.interest]
+      
+      return(0.5-retty)
     }
-  }
-
-  if (length(pr)>1) {
-    warning("Winvote routine takes one probability value only. Using first value in vector.")
-    pr <- pr[1]
-  }
-  if (length(pr)==0) {
-    warning("Winvote routine did not receive a p(win). Setting to 0.5.")
-    pr <- 0.5
-  }
-  
-  vs0 <- hyp.elects(judgeit.object,year,c(NA,0.5),truncit=F,just.mean.sd = TRUE)
-  outcome <- apply(vs0$means,2,work,vs0$sds,judgeit.object$weightvec)
-
-  if (any(is.na(outcome))) stop("Problem with the winvote routine.") else {
-    out <- array(c(mean(outcome),quantile(outcome,c(0.025,0.975))),c(1,3))
-    colnames(out) <- c("Vote Share","2.5%","97.5%")
-    rownames(out) <- paste("P(win) =",pr)
-  }
-
-  return(out)
-}
-
-`chopcollege` <-
-function(judgeit.object,year,state.ind,disaggregate=NULL) {
-
-  state.ind <- state.ind[judgeit.object$rowcodes]
-  Ev <- seq(0.4,0.6,by=0.002)
-  #disaggregation only when asked.
-  state.max <- max(state.ind)
-  if (is.null(disaggregate)) disaggregate <- rep(FALSE,state.max) else
-    if (length(disaggregate)<state.max) {
-      disag <- rep(FALSE,state.max); disag[disaggregate] <- TRUE
-      disaggregate <- disag
-    } else
-      disaggregate <- as.logical(disaggregate)
-
-  vsim0 <- hyp.elects(judgeit.object,year,truncit=FALSE,just.mean.sd=TRUE)
-  vsim <- vsim0$means
-  st.dev <- vsim0$sds
-  meanvote <- mean(vsim)
-  delta <- Ev-meanvote
-  
-  #mean matrix, sd vector, weight vector
-  elec.mean <- array(0,c(state.max,dim(vsim)[2]))
-  elec.sd <- elec.seats <- rep(0,length(state.max))
-
-  #hardcode DC.
-  extra.mean <- rbind(rep(0.8,dim(vsim)[2]))
-  extra.sd <- 0.001
-  extra.seats <- 3
-
-
-  
-  #senatorial electors, plus aggregation.
-  for (ii in 1:state.max) {
-    sub <- which(state.ind==ii)
-    if (length(sub)>0) {
-      elec.mean[ii,] <- apply(rbind(vsim[sub,]),2,weighted.mean,judgeit.object$weightvec[sub])
-      elec.sd[ii] <- mean(st.dev[sub]^2)/sqrt(length(sub))
-      elec.seats[ii] <- 2
-
-      if (disaggregate[ii]) {
-        extra.mean <- rbind(extra.mean,vsim[sub,])
-        extra.sd <- c(extra.sd,st.dev[sub])
-        extra.seats <- c(extra.seats,rep(1,length(sub)))
-      } else
-        elec.seats[ii] <- elec.seats[ii]+length(sub)
-    }
-  }
-
-  elec.mean <- rbind(elec.mean,extra.mean)
-  elec.sd <- c(elec.sd,extra.sd)
-  elec.seats <- c(elec.seats,extra.seats)
-
-  jic <- which(elec.seats>0)
-  elec.mean <- elec.mean[jic,]
-  elec.sd <- elec.sd[jic]
-  elec.seats <- elec.seats[jic]
-
-  outty <- sapply(1:length(Ev),FUN=function(ii) {
-    elecs <- elec.mean+delta[ii]
-    ex.win <- 1-pnorm(0.5,elecs,elec.sd)
-    res <- apply(ex.win,2,weighted.mean,elec.seats)
     
-    return(c(mean(res),quantile(res,c(0.025,0.975)),mean(res>=0.5)))
-  })
+    blueprint <- scatter+e.means
+    mean.adjust <- t(array(apply(blueprint,2,weighted.mean,weights),
+                           dim(t(blueprint))))
+    blueprint <- blueprint-mean.adjust
+    
+    winning.votes <- apply(blueprint,2,single.result.winning.vote)
+    ret <- quantile(winning.votes,p.win)  
+    return(ret)
+    
+  }
   
-  outty <- t(outty)
-  rownames(outty) <- Ev
-  colnames(outty) <- c("Mean Seats","2.5%","97.5%","P(Party 1 wins)")
+  outcome <- rbind(apply(vs0$means,2,winvote.one.improved))
+  
+  if (any(is.na(outcome))) stop("Missing values produced by the winvote routine.") else {
+    out <- t(rbind(apply(outcome,1,mean),apply(outcome,1,quantile,c(0.025,0.5,0.975))))
+    colnames(out) <- c("Mean Vote Share","2.5%","50%","97.5%")
+    rownames(out) <- paste("P(win) =",p.win)
+  }
+  out.object <- list(output=out,prob.win=p.win,
+                     year=judgeit.object$year,
+                     cal.year=judgeit.object$years[judgeit.object$year])
+  class(out.object) <- "judgeit.winvote"
 
-  return(list(meanvote,outty))
-  
+  return(out.object)
 }
-
