@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159-1.10b (Web2C 7.4.5) (format=pdflatex 2007.11.9)  25 AUG 2008 11:44
+This is pdfTeX, Version 3.14159-1.10b (Web2C 7.4.5) (format=pdflatex 2007.11.9)  26 AUG 2008 16:16
 **judgeit
 (./judgeit.tex{/usr/share/texmf/pdftex/config/pdftex.cfg}
 LaTeX2e <2001/06/01>
@@ -437,4 +437,4 @@ texmf/fonts/type1/bluesky/cm/cmr6.pfb></usr/share/texmf/fonts/type1/bluesky/cm/
 cmr8.pfb></usr/share/texmf/fonts/type1/bluesky/cm/cmr12.pfb></usr/share/texmf/f
 onts/type1/bluesky/cm/cmr17.pfb>{/usr/share/texmf/dvips/tetex/0ef0afca.enc}</us
 r/share/texmf/fonts/type1/bluesky/cm/cmcsc10.pfb>
-Output written on judgeit.pdf (13 pages, 193730 bytes).
+Output written on judgeit.pdf (13 pages, 193696 bytes).

@@ -1,3 +1,4 @@
+import(utils)
 export(judgeit,
 	JudgeIt,
 	v2s,
@@ -35,3 +36,20 @@ S3method(print,judgeit.conditional.seats)
 S3method(print,judgeit.winvote)
 S3method(print,judgeit.svsum)
 
+S3method(head,judgeit.seats)
+S3method(head,judgeit.voting.power)
+S3method(head,judgeit.prob)
+S3method(head,judgeit.winprob)
+S3method(head,judgeit.district.report)
+S3method(head,judgeit.conditional.seats)
+S3method(head,judgeit.winvote)
+S3method(head,judgeit.svsum)
+
+S3method(tail,judgeit.seats)
+S3method(tail,judgeit.voting.power)
+S3method(tail,judgeit.prob)
+S3method(tail,judgeit.winprob)
+S3method(tail,judgeit.district.report)
+S3method(tail,judgeit.conditional.seats)
+S3method(tail,judgeit.winvote)
+S3method(tail,judgeit.svsum)

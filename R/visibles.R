@@ -603,6 +603,9 @@ function (object,year=NA,...) {
   if (!is.null(out)) return(out)
 }
 
+`head.judgeit` <- function(x,...) head(x$output,...)
+`tail.judgeit` <- function(x,...) tail(x$output,...)
+
 
 
 #direct routine access.
@@ -612,6 +615,8 @@ function (object,year=NA,...) {
 }
 
 `print.judgeit.seats` <- function(x,...) print(x$output,...)
+`head.judgeit.seats` <- function(x,...) head(x$output,...)
+`tail.judgeit.seats` <- function(x,...) tail(x$output,...)
 
 `plot.judgeit.seats` <- function(x,...) with(x,{
   plot(c(0,1),c(0,1),ty="n",main=paste("Seats-Votes Plot for",cal.year),
@@ -638,6 +643,8 @@ function (object,year=NA,...) {
 }
 
 `print.judgeit.voting.power` <- function(x,...) print (x$output,...)
+`head.judgeit.voting.power` <- function(x,...) head(x$output,...)
+`tail.judgeit.voting.power` <- function(x,...) tail(x$output,...)
 
 `plot.judgeit.voting.power` <- function(x,...) {
 #parallel covariate plot -- scaled?
@@ -654,6 +661,8 @@ function (object,year=NA,...) {
 }
 
 `print.judgeit.prob` <- function(x,...) print(x$output,...)
+`head.judgeit.prob` <- function(x,...) head(x$output,...)
+`tail.judgeit.prob` <- function(x,...) tail(x$output,...)
 
 `plot.judgeit.prob` <- function(x,...) {
   xlib <- ifelse(x$outtype=="mean.votes","Vote Proportion","Vote Proportion (with differences)")
@@ -686,6 +695,8 @@ function (object,year=NA,...) {
 }
 
 `print.judgeit.winprob` <- function(x,...) {print(x$output)}
+`head.judgeit.winprob` <- function(x,...) head(x$output,...)
+`tail.judgeit.winprob` <- function(x,...) tail(x$output,...)
 
 
 
@@ -712,6 +723,8 @@ function (object,year=NA,...) {
 }
 
 `print.judgeit.district.report` <- function(x,...) {print(x$output)}
+`head.judgeit.district.report` <- function(x,...) head(x$output,...)
+`tail.judgeit.district.report` <- function(x,...) tail(x$output,...)
 
 
 
@@ -726,6 +739,8 @@ function (object,year=NA,...) {
 }
 
 `print.judgeit.conditional.seats` <- function(x,...) {print(x$output)}
+`head.judgeit.conditional.seats` <- function(x,...) head(x$output,...)
+`tail.judgeit.conditional.seats` <- function(x,...) tail(x$output,...)
 
 
 
@@ -742,6 +757,8 @@ function (object,year=NA,...) {
 }
 
 `print.judgeit.winvote` <- function(x,...) {print(x$output)}
+`head.judgeit.winvote` <- function(x,...) head(x$output,...)
+`tail.judgeit.winvote` <- function(x,...) tail(x$output,...)
 
 
 
@@ -786,3 +803,5 @@ function (object,year=NA,...) {
 }
 
 `print.judgeit.svsum` <- function(x,...) {print(x$svsums)}
+`head.judgeit.svsum` <- function(x,...) head(x$output,...)
+`tail.judgeit.svsum` <- function(x,...) tail(x$output,...)

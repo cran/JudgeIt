@@ -33,8 +33,7 @@ smack <- conditional.seats(j.ob,vote.range=c(0.5,1),year=46)
 head(smack)
 plot(smack)
 
-#if you don't enter a year, you will get a warning message!
-disty <- district.report(j.ob)
+disty <- district.report(j.ob,year=1982)
 head(disty)
 plot(disty)
 
