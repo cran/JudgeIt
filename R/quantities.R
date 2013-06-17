@@ -50,7 +50,9 @@ function (judgeit.object) { #,condition=NULL) {
 
 `hyp.elects` <- function(judgeit.object,zero.mean=FALSE,results=FALSE) {
   #results is obsolete.
-  
+
+  if (judgeit.object$verbose) message("Generating hypothetical elections.")
+    
   if (is.null(judgeit.object$extra.districts)) judgeit.object$extra.districts <- array(0,c(0,4))
   
   j.o <- judgeit.object
@@ -300,6 +302,8 @@ function (judgeit.object) {
   return(out.object)
 }
 
+
+
 `winvote.raw` <-
 function (judgeit.object) {
   p.win <- judgeit.object$prob.win
@@ -349,4 +353,187 @@ function (judgeit.object) {
   class(out.object) <- "judgeit.winvote"
 
   return(out.object)
+}
+
+
+`get.vote.winchance` <- function (e.means,e.sd,weights,
+                                  state.ind,disagg,
+                                  p.win=0.5,verbose=FALSE,sims=500) {
+
+  distinct.states <- sum(sapply(1:length(disagg),FUN=function(ii) {
+    1*(sum(state.ind==ii)>0)
+  }))
+  if (verbose) message("Getting the expected vote for a particular win probability.")
+  
+  single.result.winning.vote <- function(res) {
+    #row 1: outcomes
+    #row 2: seats
+
+
+    seats.in.play <- rep(1,length(res))
+    sts <- sapply(1:length(disagg),FUN=function(ii) {
+      i.s <- which(state.ind==ii)
+      if (length(i.s)>0) {
+        statewide <- weighted.mean(res[i.s],weights[i.s])
+        if (disagg[ii]) ret <- c(statewide,2) else {
+          ret <- c(statewide,length(i.s)+2)
+          seats.in.play[i.s] <<- 0
+        }
+      } else ret <- c(0,0)
+      return(ret)
+    })
+
+    res.obj <- cbind(rbind(res,seats.in.play),sts,c(0.3,3)) #Washington hard-coded.
+    res.obj <- res.obj[,order(res.obj[1,])]
+    cs.seats <- cumsum(res.obj[2,])
+    item.of.interest <- min(which(cs.seats>cs.seats[length(cs.seats)]/2))
+    retty <- res.obj[1,item.of.interest]
+    
+    return(0.5-retty)
+  }
+
+  mean.vote <- weighted.mean(e.means,weights)
+
+  blueprint <- array(rnorm(sims*length(e.means),e.means,e.sd),c(length(e.means),sims))
+  #readjust for means.
+  mean.adjust <- t(array(apply(blueprint,2,weighted.mean,weights),dim(t(blueprint))))
+  blueprint <- blueprint-mean.adjust
+
+  winning.votes <- apply(blueprint,2,single.result.winning.vote)
+
+  ret <- quantile(winning.votes,p.win)  
+  return(ret)
+  
+}
+
+#h.jud <- h.yr <- h.st <- h.dis <- h.Ev <- NULL;
+`chopcollege.raw` <-
+function(judgeit.object) {#, year, state.ind, disaggregate=NULL, Ev=NULL) {
+
+  #h.jud <<- judgeit.object; h.yr <<- year; h.st <<- state.ind
+  #h.dis <<- disaggregate; h.Ev <<- Ev
+  #judgeit.object <- h.jud; year <- h.yr; state.ind <- h.st
+  #disaggregate <- h.dis; Ev <- h.Ev
+  if (judgeit.object$verbose) message("Entering chopcollege routine.")
+
+  year <- judgeit.object$year
+  state.ind <- judgeit.object$state.group
+  disaggregate <- judgeit.object$disaggregate
+  Ev <- judgeit.object$mean.votes
+  
+  state.ind <- state.ind[judgeit.object$rowcodes]
+  if (is.null(Ev)) Ev <- seq(0.45,0.55,by=0.002)
+
+  #disaggregation only when asked.
+  state.max <- max(state.ind)
+  
+  if (is.null(disaggregate)) disaggregate <- rep(FALSE,state.max) else
+    if (length(disaggregate)<state.max) {
+      disag <- rep(FALSE,state.max); disag[disaggregate] <- TRUE
+      disaggregate <- disag
+    } else
+      disaggregate <- as.logical(disaggregate)
+
+  vsim0 <- hyp.elects(judgeit.object) 
+  vsim <- vsim0$means
+  st.dev <- vsim0$sds
+  meanvote <- mean(apply(vsim,2,weighted.mean,judgeit.object$weightvec))   #red flag here... assumes equal weights!
+
+  #mean matrix, sd vector, weight vector
+  elec.mean <- array(0,c(state.max,dim(vsim)[2]))
+  elec.sd <- elec.seats <- elec.wts <- rep(0,length(state.max))
+
+  #hardcode DC.
+  #if (judgeit.object$add.dc) {
+  extra.mean <- rbind(rep(0.8, dim(vsim)[2]))
+  extra.sd <- 0.001
+  if (judgeit.object$add.dc) {extra.seats <- 3; extra.wts <- min(judgeit.object$weightvec)
+                            } else {extra.seats <- 0; extra.wts <- 0}
+
+  if (judgeit.object$verbose) message("Preparing to measure each state's impact.")
+
+  #senatorial electors, plus aggregation.
+  for (ii in 1:state.max) {
+    sub <- which(state.ind==ii)
+    if (length(sub)>0) {
+      elec.mean[ii,] <- apply(rbind(vsim[sub,]),2,weighted.mean,judgeit.object$weightvec[sub])
+      elec.sd[ii] <- sqrt(mean(st.dev[sub]^2))/sqrt(length(sub))
+      elec.seats[ii] <- 2
+      elec.wts[ii] <- sum(judgeit.object$weightvec[sub])
+
+      if (disaggregate[ii]) {
+        extra.mean <- rbind(extra.mean,vsim[sub,])
+        extra.sd <- c(extra.sd, st.dev[sub])
+        extra.seats <- c(extra.seats, rep(1,length(sub)))
+        extra.wts <- c(extra.wts, judgeit.object$weightvec[sub])
+      } else
+        elec.seats[ii] <- elec.seats[ii]+length(sub)
+    }
+  }
+  if (judgeit.object$verbose) message("Measured each state's impact.")
+
+  elec.mean <- rbind(elec.mean, extra.mean)
+  elec.sd <- c(elec.sd, extra.sd)
+  elec.seats <- c(elec.seats, extra.seats)
+  elec.wts <- c(elec.wts, extra.wts)
+
+  
+  jic <- which(elec.seats>0)
+  elec.mean <- matrix(elec.mean[jic,], ncol=ncol(elec.mean))
+  elec.sd <- elec.sd[jic]
+  elec.seats <- elec.seats[jic]
+  elec.wts <- elec.wts[jic]
+  mean.adjust <- t(array(apply(elec.mean,2,weighted.mean,elec.wts),dim(t(elec.mean))))
+  
+  if (judgeit.object$verbose) message("Preparing each outcome.")
+  
+  outty <- sapply(1:length(Ev),FUN=function(ii) {
+    elecs <- elec.mean-mean.adjust+Ev[ii]   #should always readjust to the true mean.
+    #ex.win <- 1-pnorm(0.5,elecs,elec.sd)
+    ex.win <- 1*(array(rnorm(length(elecs),elecs,elec.sd),dim(elecs))>0.5)
+    res <- apply(ex.win,2,weighted.mean,elec.seats)
+    
+    return(c(mean(res),quantile(res,c(0.025,0.975)),mean(res>=0.5)))
+  })
+
+  if (judgeit.object$verbose) message("Preparing each winning vote.")
+  
+  res.pwinvote <- apply(vsim, 2, get.vote.winchance, st.dev,
+                        weights=judgeit.object$weightvec, state.ind,
+                        disagg=disaggregate, p.win=c(0.025,0.5,0.975),
+                        verbose=judgeit.object$verbose, sims=100)
+  
+  outty.2 <- apply(res.pwinvote,1,quantile,c(0.025,0.5,0.975))
+  
+  elecs <- elec.mean-mean.adjust+0.5   #should always readjust to the true mean.
+  ex.win <- 1-pnorm(0.5,elecs,elec.sd)
+  #  ex.win <- 1*(array(rnorm(length(elecs),elecs,elec.sd),dim(elecs))>0.5)
+  res <- apply(ex.win,2,weighted.mean,elec.seats)
+  outty.3 <- c(mean(res),quantile(res,c(0.025,0.975)),mean(res>=0.5))
+
+  
+  outty <- t(outty)
+  rownames(outty) <- Ev
+  colnames(outty) <- c("Mean Seats","2.5%","97.5%","P(Party 1 wins)")
+
+  out.object <- list(mean.vote=meanvote,
+                     sv=outty,
+                     winvote.summary=outty.2,
+                     partisan.bias=outty.3,
+                     cal.year=judgeit.object$years[year])
+  class(out.object) <- "judgeit.chopcollege"
+  
+  return(out.object)
+}
+
+`chopcollege` <- function(judgeit.object, ...) {
+
+  message ("Starting routine chopcollege.")
+  judgeit.object <- judgeit.preprocess(judgeit.object, ...)
+  message ("Finished chopcollege preprocessing.")
+
+  return (chopcollege.raw(judgeit.object))#,judgeit.object$year,
+#                          state.ind=state.group,
+#                          disaggregate,
+#                          judgeit.object$mean.votes))
 }

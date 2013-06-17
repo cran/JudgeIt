@@ -9,8 +9,8 @@ elecyears <- as.numeric(names(house6311))
 same.d <- 1*(elecyears %% 10 != 2)
 
 #load the object.
-j.ob <- judgeit(model=VOTE~unc(VOTE)+INC,vote.form=TURNOUT~1,
-                    data=house6311,use.last.votes=T,subset=DELSOUTH==0,
+j.ob <- judgeit(model=VOTE~unc(VOTE)+INC, vote.form=TURNOUT~1,
+                    data=house6311, use.last.votes=TRUE, subset=DELSOUTH==0,
                     same.d=same.d)
 
 #run some "prob" routines.

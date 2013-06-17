@@ -1,4 +1,4 @@
-`judgeit.get.sigma.lambda` <- function(judgeit.object,weight) {
+`judgeit.get.sigma.lambda` <- function(judgeit.object, weight) {
 
   weighttype <- c("constant","turnout","seats","eligible.voters")
   if (!any(weight==weighttype)) stop("Problem in preliminary analysis: unknown choice for district weights. Please select 'constant', 'turnout', 'eligible.voters' or 'seats'.") else 
@@ -59,7 +59,13 @@
 }
 
 
-`judgeit.preprocess` <- function (judgeit.object,year=NULL,
+
+
+
+
+
+`judgeit.preprocess` <- function (judgeit.object,
+                                  year=NULL,
                                   district.select=NULL,
 
                                             #general terms
@@ -80,7 +86,13 @@
                                   prob.win=c(0.1,0.5,0.9),
                                   
                                   mean.votes=NULL,
-                                  shift.in.votes=NULL)
+                                  shift.in.votes=NULL,
+                                  state.group=NULL,
+                                  disaggregate=NULL,
+
+                                  add.dc=FALSE,
+
+                                  verbose=NULL)
   
 {
 
@@ -103,11 +115,14 @@
   judgeit.object$extra.districts <- cbind(extra.districts,extra.districts2)
   #OK, fourth column is now the weight to be applied.
 
+
+
+
   
   judgeit.object$predict <- predict
   if (is.na(judgeit.object$lambda)) {
     judgeit.object$lambda <- 0.5 #what to do if no information? what would Bayes do?
-    warning ("Lambda is undefined, and is therefore estimated as 0.5.")
+    warning ("Lambda is undefined: using replacement value of 0.5.")
   }
   
   if (is.null(year)) {
@@ -137,8 +152,11 @@
   if (is.null(judgeit.object$covarsnew)) judgeit.object$covarsnew <- new.list(length(judgeit.object$covars))
   if (is.null(covarsnew)) judgeit.object$covarsnew[[year]] <- judgeit.object$covars[[year]] else
   judgeit.object$covarsnew[[year]] <- covarsnew
-  
-  if (dim(judgeit.object$covars[[year]])[2]!=dim(judgeit.object$covarsnew[[year]])[2]) stop("There is a different number of covariates in the new group compared to the old.")  
+
+  if (dim(judgeit.object$covars[[year]])[2]!=dim(judgeit.object$covarsnew[[year]])[2])
+    stop(paste0("Covariates in new group:",
+                dim(judgeit.object$covarsnew[[year]])[2],"; Old group: ",
+                dim(judgeit.object$covars[[year]])[2],"."))
 
   #in case of counterfactual, these could change.
   judgeit.object$seathold <- judgeit.object$seats[[year]]
@@ -160,28 +178,43 @@
   
   if ((any(dim(judgeit.object$covars[[year]])!=dim(judgeit.object$covarsnew[[year]])))&(!judgeit.object$predict)) {
     warning (paste("In year ",year,", old and new covariates have a different number of observations. Proceeding under prediction mode, with one seat per district, and equal population.",sep=""))
-    judgeit.object$predict <- T
+    judgeit.object$predict <- TRUE
     judgeit.object$seats[[year]] <- cbind(rep(1,dim(judgeit.object$covarsnew[[year]])[1]))   #all set to 1.
     judgeit.object$eligible.voters[[year]] <- judgeit.object$turnout[[year]] <- cbind(rep(404,dim(judgeit.object$covarsnew[[year]])[1]))   #all set to 404.
   }
+
 
   with (judgeit.object,
         if (!all(c(length(seats[[year]])==dim(covarsnew[[year]])[1],
                    length(turnout[[year]])==dim(covarsnew[[year]])[1],
                    length(eligible.voters[[year]])==dim(covarsnew[[year]])[1])))
-        stop (paste("Error in evaluation stage: the number of covariate, seat, eligible and actual voter rows do not match each other."))
+        stop (paste0("Row length mismatch in evaluation stage: covariate rows: ",dim(covarsnew[[year]])[1],
+                     "; seat rows: ",length(seats[[year]]),
+                     "; eligible voter rows: ",length(eligible.voters[[year]]),
+                     "; actual turnout rows: ",length(turnout[[year]])))
         )
+
+
+
   
   if (is.null(new.pop.groups)) judgeit.object$pop.mat <- judgeit.object$pop.group.matrix[[year]] else {
     if (dim(new.pop.groups)[1]!=length(judgeit.object$turnout[[year]]))
       stop ("Population groups do not have the correct number of districts.")
     judgeit.object$pop.mat <- new.pop.groups
   }
+
   
-  if (is.null(district.select))
-    district.select <- 1:length(judgeit.object$voteshare[[year]]) else
+  if (is.null(district.select)){
+    district.select <- 1:length(judgeit.object$voteshare[[year]])
+    if ((any(dim(judgeit.object$covars[[year]])!=dim(judgeit.object$covarsnew[[year]])))&(judgeit.object$predict)){
+     district.select <- 1:dim(judgeit.object$covarsnew[[year]])[1]
+     }
+  } else{
   if (length(district.select)>length(judgeit.object$voteshare[[year]]))
     stop("In preprocess: Your district selection vector doesn't have the right number of districts.")
+       }
+  
+
   
   weighttype <- c("constant","turnout","seats","eligible.voters")
   judgeit.object$distweights[[year]] <- switch(judgeit.object$weight,
@@ -215,13 +248,14 @@
 
   pwin <- 1-pnorm(0.5,mu,std)
   tbo <- cbind(mu,std,pwin,judgeit.object$seats[[year]])
-  inn <- intersect(missed(tbo),district.select)
+  inn <- intersect(missed(tbo), district.select)
 
   judgeit.object$baseline <- cbind(base[inn])
   judgeit.object$mult <- cbind(qun[inn,])
   judgeit.object$stoned <- stoned[inn]
   judgeit.object$gamma.std <- gamma.std
 
+  
   judgeit.object$mu <- mu[inn]
   judgeit.object$std <- std[inn]
   judgeit.object$pwin <- pwin[inn]
@@ -232,7 +266,7 @@
   judgeit.object$votevec <- cbind(judgeit.object$voteshare[[year]][inn])
   judgeit.object$rows <- rownames(judgeit.object$covars[[year]])[inn]
   judgeit.object$rowcodes <- inn
-  judgeit.object$meanvote <- weighted.mean(judgeit.object$mu,judgeit.object$weightvec)
+  judgeit.object$meanvote <- weighted.mean(judgeit.object$mu, judgeit.object$weightvec)
 
   
   judgeit.object$vote.range <- vote.range
@@ -240,6 +274,16 @@
   judgeit.object$seat.range <- seat.range
   judgeit.object$prob.win <- prob.win
 
+  judgeit.object$state.group <- state.group
+  judgeit.object$disaggregate <- disaggregate
+
+  
+  if (is.null(judgeit.object$verbose) | !is.null(verbose)) judgeit.object$verbose <- verbose
+  if (is.null(judgeit.object$verbose)) judgeit.object$verbose <- FALSE
+  
+  judgeit.object$add.dc <- add.dc
+
+  
   if (!is.null(judgeit.object$pop.mat))
     judgeit.object$pop.mat <- judgeit.object$pop.mat[inn,] else
       judgeit.object$pop.mat <- cbind(judgeit.object$turnoutvec)
@@ -251,24 +295,37 @@
   judgeit.object$mean.votes <- mean.votes
   judgeit.object$shift.in.votes <- shift.in.votes
 
-  judgeit.object$obsvotes <- weighted.mean(c(judgeit.object$voteshare[[year]],                                             judgeit.object$ext[,1]),
-                                           c(judgeit.object$distweights[[year]],
-                                             judgeit.object$ext[,4]),na.rm=T)
-  judgeit.object$obsseats <- weighted.mean(v2s(c(judgeit.object$voteshare[[year]],
-                                                 judgeit.object$ext[,3])),
-                                           c(judgeit.object$seats[[year]],
-                                             judgeit.object$ext[,4]),na.rm=T)
+
+  #message(paste(length(judgeit.object$voteshare[[year]]),
+  #              length(judgeit.object$ext[,1]),
+  #              length(judgeit.object$distweights[[year]]),
+  #              length(judgeit.object$ext[,4])))
+
+    
+  if (!judgeit.object$predict) {
+    judgeit.object$obsvotes <- weighted.mean(c(judgeit.object$voteshare[[year]],
+                                               judgeit.object$ext[,1]),
+                                             c(judgeit.object$distweights[[year]],
+                                               judgeit.object$ext[,4]),na.rm=TRUE)
+    judgeit.object$obsseats <- weighted.mean(v2s(c(judgeit.object$voteshare[[year]],
+                                                   judgeit.object$ext[,3])),
+                                             c(judgeit.object$seats[[year]],
+                                               judgeit.object$ext[,4]),na.rm=TRUE)
+  }
   
   return(judgeit.object)
 }
 
 `judgeit` <-
-function (model.formula=~1,vote.formula=NULL,same.districts=NULL,
-          data,pop.groups=NULL,
+function (model.formula=~1,
+          vote.formula=NULL,
+          same.districts=NULL,
+          data,
+          pop.groups=NULL,
 
-          uncontesteds.method="default",uncontested.low=0.05,
-          uncontested.low.new=0.25,uncontested.high=0.95,
-          uncontested.high.new=0.75,
+          uncontesteds.method="default",
+          uncontested.low=0.05, uncontested.low.new=0.25,
+          uncontested.high=0.95, uncontested.high.new=0.75,
 
           use.last.votes=TRUE,
           simulations=201, 
@@ -276,13 +333,22 @@ function (model.formula=~1,vote.formula=NULL,same.districts=NULL,
           weight="constant", 
           years=NULL,
           
-          routine=NULL,year=NULL,judgeit.object=NULL,
+          routine=NULL, year=NULL, judgeit.object=NULL,
+          verbose=FALSE,
+
+          #arguments for preprocess.
+          #predict=FALSE,
+          #new.covariates=NULL,  
+          #new.covariate.matrix=NULL,  
+          #new.seats=NULL,
+          #new.actual.voters=NULL,
+          #new.eligible.voters=NULL,
           
           ...    
           )
 { #judgeit
     
-  verbose <- FALSE
+  #verbose <- FALSE
   if (is.null(judgeit.object)) { #data loading stage.
     yy <- xx <- wts <- wtv <- wtt <- NULL
     pop.group.matrix <- new.list(length(data))
@@ -349,7 +415,7 @@ function (model.formula=~1,vote.formula=NULL,same.districts=NULL,
         if (!is.null(pop.groups)) {
           pop.frame <- model.frame(formula=pop.groups,
                                    data=data[[ii]],
-                                   na.action=na.pass,...)
+                                   na.action=na.pass, ...)
           pop.group.matrix[[1]] <- model.preds(pop.frame)
         }
 
@@ -359,22 +425,29 @@ function (model.formula=~1,vote.formula=NULL,same.districts=NULL,
       judgeit.setdata(xx,yy,wtv,wtt,wts,
                       same.districts=same.districts,
                       uncontesteds.method=uncontesteds.method,
-                      simulations=simulations)
-    
+                      uncontested.low=uncontested.low, uncontested.low.new=uncontested.low.new,
+                      uncontested.high=uncontested.high, uncontested.high.new=uncontested.high.new,
+                      simulations=simulations, weight=weight,
+                      use.last.votes=use.last.votes)
+
     judgeit.object$years <- years
     #prelim routine.
-    judgeit.object <- judgeit.get.sigma.lambda(judgeit.object,weight)
+    judgeit.object <- judgeit.get.sigma.lambda(judgeit.object, weight)
 
     judgeit.object$pop.groups <- pop.group.matrix
   }  #first step done.
 
+  judgeit.object$verbose <- verbose
   
   if (!is.null(routine)) {
-
-    #move to "voting power" check section.
-
     
-    judgeit.object <- judgeit.preprocess(judgeit.object,year,...)
+    judgeit.object <- judgeit.preprocess(judgeit.object, year,
+#                                         predict=TRUE,
+#                                         new.covariate.matrix=enacted.matrix,
+#                                         new.seats=rep(1,dim(enacted.matrix)[1]),
+#                                         new.actual.voters=rep(1,dim(enacted.matrix)[1]),
+#                                         new.eligible.voters=rep(1,dim(enacted.matrix)[1]),
+                                         ...)
 
     output <-
       switch (routine,
@@ -382,10 +455,13 @@ function (model.formula=~1,vote.formula=NULL,same.districts=NULL,
               "prob" = pv(judgeit.object),
               "conditional.seats" = freq (judgeit.object),
               "svsum" = svsum.raw(judgeit.object),
+              "svsums" = svsum.raw(judgeit.object),
               "distreport" = dists(judgeit.object),
               "voting.power" = voting.power.raw(judgeit.object),
               "winvote" = winvote.raw(judgeit.object),
               "winprob" = winprob(judgeit.object),
+              "chopcollege" = chopcollege.raw(judgeit.object),
+              
               writeLines ("An unknown routine was entered.")
               )
 
@@ -403,19 +479,20 @@ function (model.formula=~1,vote.formula=NULL,same.districts=NULL,
 
 
 `judgeit.setdata` <-
-function (covars=NULL,voteshare=NULL,turnout=NULL,eligible.voters=NULL,
-          seats=NULL,same.districts=NULL,use.last.votes=T,
-          uncontesteds.method="impute",uncontested.low=0.05,
-          uncontested.low.new=0.25,uncontested.high=0.95,
-          uncontested.high.new=0.75,simulations=200,weight="constant") {
+function (covars=NULL, voteshare=NULL, turnout=NULL, eligible.voters=NULL,
+          seats=NULL, same.districts=NULL, use.last.votes=TRUE,
+          uncontesteds.method="impute", uncontested.low=0.05,
+          uncontested.low.new=0.25, uncontested.high=0.95,
+          uncontested.high.new=0.75, simulations=200, weight="constant") {
 
-  flag <- F
+  flag <- FALSE
 
   out <- list(covars=covars,voteshare=voteshare,turnout=turnout)
 
-  if (is.null(same.districts)) same.districts <- rep(0,length(voteshare))
-  if (length(voteshare)>1) for (ii in 2:length(voteshare)) same.districts[ii] <- 1*(length(voteshare[[ii]])==length(voteshare[[ii-1]]))
-  
+  if (is.null(same.districts)) {
+    same.districts <- rep(0,length(voteshare)) 
+    if (length(voteshare)>1) for (ii in 2:length(voteshare)) same.districts[ii] <- 1*(length(voteshare[[ii]])==length(voteshare[[ii-1]]))
+  } else if (length(same.districts)!=length(voteshare)) stop("Number of terms in same.districts vector does not match the number of elections.")
   
   if (is.null(turnout)) {
     writeLines ("Number of actual voters unknown, so let's say 404 per district.")
@@ -538,7 +615,7 @@ function (covars=NULL,voteshare=NULL,turnout=NULL,eligible.voters=NULL,
 function (...) judgeit(...)
 
 `kernel.plot` <-
-function (y,y2=NULL,col=1,ty="l",new=T,grid=T,...) {
+function (y, y2=NULL, col=1, ty="l", new=TRUE, grid=TRUE, ...) {
   dt <- density(y,from=0,to=1)
   if (!is.null(y2)) {dt2 <- density(y2,from=0,to=1); maxy <- max(c(dt$y),c(dt2$y))} else
     maxy <- max(dt$y)
@@ -550,23 +627,28 @@ function (y,y2=NULL,col=1,ty="l",new=T,grid=T,...) {
 }
 
 `plot.judgeit` <-
-function(x,straight.up=F,year=1,...) {
-  judgeit.object <- x
+function(x,straight.up=FALSE, year=1, ...) {
   
-  if (length(judgeit.object$outputyear)>0)
-    yrfull <- judgeit.object$years[judgeit.object$outputyear] else
+  if (length(x$outputyear)>0)
+    yrfull <- x$years[x$outputyear] else
   yrfull <- year
 
-  switch (judgeit.object$outputclass,
-          "seats" = plot(judgeit.object$output),
-          "prob" = plot(judgeit.object$output),
-          "distreport" = plot(judgeit.object$output),
-          {year <- judgeit.object$outputyear
-           writeLines (paste("Outputting a kernel plot of districts in year ",
-                             yrfull,".",sep=""))
-           yy <- judgeit.object$voteshare[[year]]
-           yy <- yy[!is.na(yy)]; kernel.plot(yy)
-         })
+  if (length(x$output)>0) {
+    plot(x$output, ...)
+  } else {
+    year <- x$outputyear
+    message (paste("Outputting a kernel plot of districts in year ",
+                   yrfull,".",sep=""))
+    yy <- x$voteshare[[year]]
+    yy <- yy[!is.na(yy)]; kernel.plot(yy, ...)
+  }
+  
+ #   switch (judgeit.object$outputclass,
+ #         "seats" = plot(judgeit.object$output),
+ #         "prob" = plot(judgeit.object$output),
+ #         "distreport" = plot(judgeit.object$output),
+ #         "chopcollege" = plot(judgeit.object$output),  )
+    
 }
 
 `print.judgeit` <-
@@ -618,9 +700,12 @@ function (object,year=NA,...) {
 `head.judgeit.seats` <- function(x,...) head(x$output,...)
 `tail.judgeit.seats` <- function(x,...) tail(x$output,...)
 
-`plot.judgeit.seats` <- function(x,...) with(x,{
-  plot(c(0,1),c(0,1),ty="n",main=paste("Seats-Votes Plot for",cal.year),
-       xlab="Vote Proportion",ylab="Seat Proportion",...)
+`plot.judgeit.seats` <- function(x, main=NULL, xlab=NULL, ylab=NULL, ...) with(x,{
+  if (is.null(main)) main <- paste("Seats-Votes Plot for",cal.year)
+  if (is.null(xlab)) xlab <- "Vote Proportion"
+  if (is.null(ylab)) ylab <- "Seat Proportion"
+  
+  plot(c(0,1),c(0,1),ty="n",main=main, xlab=xlab, ylab=ylab, ...)
   t.x <- as.numeric(rownames(output))
   t.y <- output[,1]
   line.bottom <- output[,2]
@@ -707,17 +792,21 @@ function (object,year=NA,...) {
 `distreport` <- function(judgeit.object,...) district.report(judgeit.object,...)
 
 
-`plot.judgeit.district.report` <- function(x,...) {
+`plot.judgeit.district.report` <- function(x, xlab=NULL, ylab=NULL, main=NULL, ...) {
+  if (is.null(xlab)) xlab <- "Vote Share"
+  if (is.null(ylab)) ylab <- "Likelihood of District Vote"
+  if (is.null(main)) main <- paste("District Vote Likelihood Plot for",x$cal.year)
+  
   if (colnames(x$output)[2]!="Std. Dev.") {
     kernel.plot (x$output[,1],x$output[,2],
-                 xlab="Vote Share",ylab="Likelihood of District Vote",
-                 main=paste("District Vote Likelihood Plot for",x$cal.year),...)
+                 xlab=xlab, ylab=ylab,
+                 main=main, ...)
     text(0.9,1.3,"Observed Votes",col=1,...)
     text(0.9,1.4,"Model Prediction",col=2,...)
   } else {
     kernel.plot (x$output[,1],
-                 xlab="Vote Share",ylab="Likelihood of District Vote",
-                 main=paste("District Vote Likelihood Plot for",x$cal.year),...)
+                 xlab=xlab, ylab=ylab,
+                 main=main, ...)
     text(0.9,1.4,"Model Prediction",col=1,...)
   }
 }
@@ -805,3 +894,39 @@ function (object,year=NA,...) {
 `print.judgeit.svsum` <- function(x,...) {print(x$svsums)}
 `head.judgeit.svsum` <- function(x,...) head(x$output,...)
 `tail.judgeit.svsum` <- function(x,...) tail(x$output,...)
+
+`plot.judgeit.chopcollege` <- function(x, xlab=NULL, ylab=NULL, main=NULL,
+                                       show.mean.vote=TRUE, ...) with(x,{
+
+  if (is.null(xlab)) xlab <- "Vote Proportion"
+  if (is.null(ylab)) ylab <- "Elector Proportion"
+  if (is.null(main)) main <- paste("Electoral College Plot for ",cal.year)
+
+  plot(c(0,1),c(0,1),ty="n", main=main, xlab=xlab, ylab=ylab, ...)
+  
+  t.x <- as.numeric(rownames(sv))
+  t.y <- sv[,1]
+  line.bottom <- sv[,2]
+  line.top <- sv[,3]
+  lines(t.x,t.y)
+  lines(t.x,pmin(1,line.top),col=3)
+  lines(t.x,pmax(line.bottom,0),col=3)
+  abline(h=0.5,col=8)
+  abline(v=0.5,col=8)
+
+  if (show.mean.vote) abline(v=mean.vote,lty=2,col=4)
+
+  #put winning-vote measures on there too.
+  #partisan bias.
+  points(0.5, partisan.bias[1], col=2, pch=19)
+  lines(rep(0.5,2), partisan.bias[2:3], col=2, lwd=2)
+  #lines(0.5+c(-0.005,0.005),rep(partisan.bias[2],2),col=2)
+  #lines(0.5+c(-0.005,0.005),rep(partisan.bias[3],2),col=2)
+  
+  #winvote.
+  points(winvote.summary[2,2], 0.5, col=4, pch=19)
+  lines(winvote.summary[2,c(1,3)],rep(0.5,2),col=4, lwd=2)
+  #lines(rep(winvote.summary[2,1],2),0.5+c(-0.004,0.004),col=4)
+  #lines(rep(winvote.summary[2,3],2),0.5+c(-0.004,0.004),col=4)
+
+})

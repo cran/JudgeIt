@@ -6,13 +6,13 @@ export(judgeit,
 
 	seats,
 	voting.power,
-	prob,seats.with.prob,
-	results.prob,winprob,
-	distreport,district.report,
+	prob, seats.with.prob,
+	results.prob, winprob,
+	distreport, district.report,
 	conditional.seats,
-	votes.for.result,winvote,
-	bias.resp,svsum
-	)
+	votes.for.result, winvote,
+	bias.resp, svsum,
+	chopcollege)
 
 S3method(summary,judgeit)   
 S3method(print,judgeit)   
@@ -26,6 +26,8 @@ S3method(plot,judgeit.district.report)
 S3method(plot,judgeit.conditional.seats)
 S3method(plot,judgeit.winvote)
 S3method(plot,judgeit.svsum)
+S3method(plot,judgeit.chopcollege)
+
 
 S3method(print,judgeit.seats)
 S3method(print,judgeit.voting.power)

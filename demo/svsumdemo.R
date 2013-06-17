@@ -8,9 +8,9 @@ unc <- function(inp) -1*(inp<0.05)+1*(inp>0.95)
 elecyears <- as.numeric(names(house6311))
 
 #load the object.
-j.ob <- judgeit(model.form=VOTE~unc(VOTE)+INC,vote.form=TURNOUT~1,
-                    data=house6311,same.districts=(elecyears%%10!=2),
-                    use.last.votes=T,subset=DELSOUTH==0)
+j.ob <- judgeit(model.form=VOTE~unc(VOTE)+INC, vote.form=TURNOUT~1,
+                    data=house6311, same.districts=(elecyears%%10!=2),
+                    use.last.votes=TRUE, subset=DELSOUTH==0)
 
 #get some seats-votes summaries.
 j.ob.1 <- bias.resp(j.ob,year=1944)

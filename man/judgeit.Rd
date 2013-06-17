@@ -22,9 +22,8 @@ judgeit (model.formula=~1,vote.formula=NULL,same.districts=NULL,
           weight="constant", 
           years=NULL,
           
-          routine=NULL,year=NULL,judgeit.object=NULL,
-          ... 
-          )
+          routine=NULL, year=NULL, judgeit.object=NULL,
+          verbose=FALSE, ... )
 
 }
 %- maybe also 'usage' for other objects documented here.
@@ -72,6 +71,7 @@ judgeit (model.formula=~1,vote.formula=NULL,same.districts=NULL,
   \item{year}{If desired, the election for which the above routine will be run.}
   \item{judgeit.object}{If desired, a pre-existing object from which judgeit() will
     obtain the model.}
+  \item{verbose}{If TRUE, extra messages will be displayed during execution.}
   
   \item{\dots}{Extra commands to be used with model.frame(), a routine
     used in assembling the linear model for each year.}
@@ -88,11 +88,13 @@ judgeit (model.formula=~1,vote.formula=NULL,same.districts=NULL,
 \examples{
 
 #Demo files are available through the following commands:
+\dontrun{
 demo(judgeit.primer)
 demo(seatsdemo)
 demo(probdemo)
 demo(svsumdemo)
 demo(distreportdemo)
+}
 
 data(house6311)
 #columns: STATE,DIST,INC,VOTE,TURNOUT,DELSOUTH
@@ -105,7 +107,7 @@ same.dists <- rep(1,49); same.dists[seq(4,49,by=5)] <- 0
 
 j.ob <- judgeit(model.formula=VOTE~unc(VOTE)+INC,vote.formula=TURNOUT~1,
                data=house6311,
-               use.last.votes=T,subset=DELSOUTH==0,same.d=same.dists)
+               use.last.votes=TRUE, subset=DELSOUTH==0,same.d=same.dists)
 
 summary(j.ob)
 summary(j.ob,which(years==1942))

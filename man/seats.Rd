@@ -12,6 +12,7 @@
 \alias{winvote}
 \alias{bias.resp}
 \alias{svsum}
+\alias{chopcollege}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{JudgeIt analysis routines}
 \description{
@@ -38,6 +39,9 @@
 
   bias.resp (or svsum): Output the partisan bias and responsiveness of
   the electoral system under consideration.
+
+  chopcollege: Determine the seats-votes curve for the Electoral
+  College, conditional on the method for dividing electoral votes
 }
 \usage{
   seats(judgeit.object,...) #mean.votes=NULL,
@@ -47,7 +51,8 @@
   district.report(judgeit.object,...)
   conditional.seats(judgeit.object,...) #vote.range=c(0.4,0.6),
   votes.for.result(judgeit.object,...) #prob.win=c(0.1,0.5,0.9),
-  bias.resp(judgeit.object,...)
+  bias.resp(judgeit.object, ...)
+  chopcollege(judgeit.object, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -89,4 +94,7 @@
   An object of a judgeit sub-class.
 }
 \author{Andrew C. Thomas}
+\references{Thomas, Gelman, King, Katz (2012) ``Estimating Partisan Bias
+  of the Electoral College Under Proposed Changes in Elector
+  Apportionment'', Statistics, Politics and Policy.}
 \keyword{array}
