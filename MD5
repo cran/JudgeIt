@@ -1,4 +1,4 @@
-55d9c996b2d367a06b8ed570f82eec37 *DESCRIPTION
+7f1f321d97ea3930c4aafaeb9dac4af1 *DESCRIPTION
 3f4f1aa4986fd20bf9d9afb147a1e38b *NAMESPACE
 e901c7f988c5fea013906cc2740223df *R/operators.R
 5c71777dc703b1504bd18f1a7cc03b78 *R/quantities.R
@@ -13,7 +13,7 @@ bbccd02f768fabef370f0466f03ade4b *demo/probdemo.R
 62f5e2f7862596e4604dc852dc8a0c58 *demo/seatsdemo.R
 00045380624da96f7ffc772a5a7c6169 *demo/svsumdemo.R
 a87897d58d60eaf3bba448600e66ac8f *inst/doc/index.shtml
-4fbd1cd881f947a0c006e4ce5c0d8fe9 *inst/doc/judgeit.pdf
+80ac2db0b5cc2b0954f7bb87568cb7b8 *inst/doc/judgeit.pdf
 3ce4831099c23d245e89bfcdd81dcf6a *inst/doc/judgeit.tex
 fc4f9b4dbae753cd31dd4be42d417731 *inst/doc/judgeittechniques.pdf
 60d7867bef89d390d902cbdffa7ef6c0 *inst/doc/judgeittechniques.tex
